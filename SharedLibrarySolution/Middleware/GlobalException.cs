@@ -42,6 +42,7 @@ namespace SharedLibrarySolution.Middleware
             catch (Exception ex)
             {
                 LogException.LogError(ex);
+
                 await HandleExceptionAsync(context, ex);
 
                 if (ex is TaskCanceledException || ex is TimeoutException)
