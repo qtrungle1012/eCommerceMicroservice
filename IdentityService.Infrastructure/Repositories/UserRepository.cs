@@ -3,7 +3,6 @@ using IdentityService.Application.Interfaces.IRepositories;
 using IdentityService.Domain.Entities;
 using IdentityService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using SharedLibrarySolution.Interfaces;
 using SharedLibrarySolution.Logs;
 using System.Linq.Expressions;
 
@@ -100,6 +99,11 @@ namespace IdentityService.Infrastructure.Repositories
                 LogException.LogError(ex);
                 throw;
             }
+        }
+
+        public async Task<User?> GetByUsernameAsync(string username)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
         }
 
         public IQueryable<User> Query() => _context.Users.AsQueryable();

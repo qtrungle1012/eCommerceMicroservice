@@ -1,42 +1,43 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using IdentityService.Application;
-using IdentityService.Infrastructure.DependencyInjection;
+using IdentityService.Infrastructure;
 using IdentityService.Presentation.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// 1️⃣ Sử dụng Autofac
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+
+// 2️⃣ Đăng ký DbContext + JwtSettings (Infrastructure)
+builder.Services.AddInfrastructureServices(builder.Configuration);
+
+// 3️⃣ Register Autofac container cho Repository, Service, Hasher
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
-    // tự động đăng ký các repo, service và hasher trong Infrastructure
-    containerBuilder.RegisterAssemblyTypes(typeof(IdentityService.Infrastructure.DependencyInjection.ServiceContainer).Assembly)
-    .Where(t => t.Name.EndsWith("Repository") || t.Name.EndsWith("Service") || t.Name.EndsWith("Hasher"))
-    .AsImplementedInterfaces()
-    .InstancePerLifetimeScope();
+    containerBuilder.RegisterAssemblyTypes(typeof(IdentityService.Infrastructure.ConfigureServices).Assembly)
+        .Where(t => t.Name.EndsWith("Repository") || t.Name.EndsWith("Service") || t.Name.EndsWith("Hasher"))
+        .AsImplementedInterfaces()
+        .InstancePerLifetimeScope();
 });
+
+// 4️⃣ Application layer + API versioning
 builder.Services.AddApplicationServices();
 builder.Services.AddApiVersioningConfiguration();
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddInfrastructureService(builder.Configuration);
 
 var app = builder.Build();
 
-app.UseInfrastructurePolicy();
+// 5️⃣ Middleware chung
+app.UseInfrastructurePolicies();
 
-
- app.UseSwagger();
- app.UseSwaggerUI();
-
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.MapControllers();
