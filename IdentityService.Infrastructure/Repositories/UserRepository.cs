@@ -49,12 +49,16 @@ namespace IdentityService.Infrastructure.Repositories
             }
         }
 
-        public async Task<IEnumerable<User>> GetAllAsync(Expression<Func<User, bool>> predicate)
+        public async Task<IEnumerable<User>> GetAllAsync(Expression<Func<User, bool>>? predicate = null)
         {
             try
             {
-                var listUsers = _context.Users.ToListAsync();
-                return await listUsers.ContinueWith(t => (IEnumerable<User>)t.Result);
+                IQueryable<User> query = _context.Users;
+
+                if (predicate != null)
+                    query = query.Where(predicate);
+
+                return await query.ToListAsync();
             }
             catch (Exception ex)
             {
@@ -98,7 +102,7 @@ namespace IdentityService.Infrastructure.Repositories
             }
         }
 
-        
+        public IQueryable<User> Query() => _context.Users.AsQueryable();
 
         public async Task<User> UpdateAsync(Guid id, User entity)
         {

@@ -1,6 +1,4 @@
-﻿using IdentityService.Application.Interfaces;
-using IdentityService.Infrastructure.Data;
-using IdentityService.Infrastructure.Repositories;
+﻿using IdentityService.Infrastructure.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

@@ -1,6 +1,10 @@
-﻿using IdentityService.Application.Interfaces.IRepositories;
+﻿using IdentityService.Application.Common.Exceptions;
+using IdentityService.Application.Interfaces.IRepositories;
 using IdentityService.Domain.Entities;
 using IdentityService.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
+using SharedLibrarySolution.Logs;
+using System;
 using System.Linq.Expressions;
 
 namespace IdentityService.Infrastructure.Repositories
@@ -10,34 +14,107 @@ namespace IdentityService.Infrastructure.Repositories
         private readonly IdentityDbContext _context;
         public RoleRepository(IdentityDbContext context) => _context = context;
 
-        public Task<Role> CreateAsync(Role entity)
+        public async Task<Role> CreateAsync(Role entity)
+        {
+            try {
+                await _context.Roles.AddAsync(entity);
+                await _context.SaveChangesAsync();
+                return entity;
+            }
+            catch (Exception ex) {
+                LogException.LogError(ex);
+                throw;
+            }
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            try
+            {
+                var existingRole = await _context.Roles.FindAsync(id);
+                if (existingRole == null)
+                    throw new AppException("Role not found");
+
+                _context.Roles.Remove(existingRole);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                LogException.LogError(ex);
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<Role>> GetAllAsync(Expression<Func<Role, bool>>? predicate)
+        {
+            try
+            {
+                var listRoles = _context.Roles.ToListAsync();
+                return await listRoles.ContinueWith(t => (IEnumerable<Role>)t.Result);
+            }
+            catch (Exception ex)
+            {
+                LogException.LogError(ex);
+                throw;
+            }
+        }
+
+        public async Task<Role?> GetByAsync(Expression<Func<Role, bool>> predicate)
+        {
+            try
+            {
+                var user = await _context.Roles.AsNoTracking().FirstOrDefaultAsync(predicate);
+                if (user == null)
+                    throw new AppException("Role not found");
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                LogException.LogError(ex);
+                throw;
+            }
+        }
+
+        public async Task<Role?> GetByIdAsync(Guid id)
+        {
+            try
+            {
+                var user = await _context.Roles.FirstOrDefaultAsync(r=>r.Id==id);
+                if (user == null)
+                    throw new AppException("Role not found");
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                LogException.LogError(ex);
+                throw;
+            }
+        }
+
+        public IQueryable<Role> Query()
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(Guid id)
+        public async Task<Role> UpdateAsync(Guid id, Role entity)
         {
-            throw new NotImplementedException();
-        }
+            try
+            {
+                var existingRole = await _context.Roles.FindAsync(id);
+                if (existingRole == null)
+                    throw new AppException("Role not found");
 
-        public Task<IEnumerable<Role>> GetAllAsync(Expression<Func<Role, bool>> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Role?> GetByAsync(Expression<Func<Role, bool>> predicate)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Role?> GetByIdAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Role> UpdateAsync(Guid id, Role entity)
-        {
-            throw new NotImplementedException();
+                _context.Entry(existingRole).CurrentValues.SetValues(entity);
+                await _context.SaveChangesAsync();
+                return existingRole;
+            }
+            catch (Exception ex)
+            {
+                LogException.LogError(ex);
+                throw;
+            }
         }
     }
 }

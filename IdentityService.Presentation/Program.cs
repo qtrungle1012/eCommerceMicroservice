@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using IdentityService.Application;
 using IdentityService.Infrastructure.DependencyInjection;
+using IdentityService.Presentation.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +17,8 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     .AsImplementedInterfaces()
     .InstancePerLifetimeScope();
 });
+builder.Services.AddApplicationServices();
+builder.Services.AddApiVersioningConfiguration();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
