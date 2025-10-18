@@ -57,7 +57,7 @@ namespace IdentityService.Infrastructure.Repositories
                 if (predicate != null)
                     query = query.Where(predicate);
 
-                return await query.ToListAsync();
+                return await query.Include(r => r.Role).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -67,28 +67,28 @@ namespace IdentityService.Infrastructure.Repositories
         }
 
         // Get user by condition (VD: username, email)
-        public async Task<User?> GetByAsync(Expression<Func<User, bool>> predicate)
-        {
-            try
-            {
-                var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(predicate);
-                if (user == null)
-                    throw new AppException("User not found");
+        //public async Task<User?> GetByAsync(Expression<Func<User, bool>> predicate)
+        //{
+        //    try
+        //    {
+        //        var user = await _context.Users.AsNoTracking().Include(r => r.Role).FirstOrDefaultAsync(predicate);
+        //        if (user == null)
+        //            throw new AppException("User not found");
 
-                return user;
-            }
-            catch (Exception ex)
-            {
-                LogException.LogError(ex);
-                throw;
-            }
-        }
+        //        return user;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LogException.LogError(ex);
+        //        throw;
+        //    }
+        //}
 
         public async Task<User?> GetByIdAsync(Guid id)
         {
             try
             {
-                var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == id);
+                var user = await _context.Users.AsNoTracking().Include(r => r.Role).FirstOrDefaultAsync(u => u.Id == id);
                 if (user == null)
                     throw new AppException("User not found");
 
@@ -103,10 +103,29 @@ namespace IdentityService.Infrastructure.Repositories
 
         public async Task<User?> GetByUsernameAsync(string username)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
+            // cần trả ra đủ role và permission để generate token cho user
+            try
+            {
+                var user = await _context.Users
+                .Include(u => u.Role)
+                    .ThenInclude(r => r.RolePermissions)
+                        .ThenInclude(rp => rp.Permission)
+                .FirstOrDefaultAsync(u => u.UserName == username);
+
+                if (user == null)
+                    throw new AppException("User not found");
+
+                return user;
+            }
+            catch (Exception ex)
+            {
+                LogException.LogError(ex);
+                throw;
+            }
+            
         }
 
-        public IQueryable<User> Query() => _context.Users.AsQueryable();
+        public IQueryable<User> Query() => _context.Users.AsQueryable().Include(u => u.Role);
 
         public async Task<User> UpdateAsync(Guid id, User entity)
         {
@@ -127,7 +146,9 @@ namespace IdentityService.Infrastructure.Repositories
             }
 
         }
-
-  
     }
 }
+
+// các hàm get có thêm .ThenInclude(ur => ur.Role) là do User và Role có mối quan hệ n-n
+// khi đó xuất iện bảng UserRole nếu chỉ Include thôi thì chỉ truy cập đến UserRole nếu muốn
+// lấy ra các role của từng user thì thêm .ThenInclude(ur => ur.Role) cái nữa

@@ -11,7 +11,6 @@ namespace IdentityService.Infrastructure.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Permission> Permissions { get; set; }
-        public DbSet<UserRole> UserRoles { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
         public DbSet<RefreshToken> RefreshToken { get; set; }
 
@@ -19,24 +18,8 @@ namespace IdentityService.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Bảng trung gian UserRole
-            modelBuilder.Entity<UserRole>()
-                .HasKey(ur => new { ur.UserId, ur.RoleId });
-
-            // Bảng trung gian RolePermission
             modelBuilder.Entity<RolePermission>()
                 .HasKey(rp => new { rp.RoleId, rp.PermissionId });
-
-            // Thiết lập quan hệ (nếu chưa)
-            modelBuilder.Entity<UserRole>()
-                .HasOne(ur => ur.User)
-                .WithMany(u => u.UserRoles)
-                .HasForeignKey(ur => ur.UserId);
-
-            modelBuilder.Entity<UserRole>()
-                .HasOne(ur => ur.Role)
-                .WithMany(r => r.UserRoles)
-                .HasForeignKey(ur => ur.RoleId);
 
             modelBuilder.Entity<RolePermission>()
                 .HasOne(rp => rp.Role)
@@ -47,6 +30,13 @@ namespace IdentityService.Infrastructure.Data
                 .HasOne(rp => rp.Permission)
                 .WithMany(p => p.RolePermissions)
                 .HasForeignKey(rp => rp.PermissionId);
+
+            // ⚙️ User - Role: quan hệ 1-n (1 role có nhiều user)
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Role)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.RoleId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

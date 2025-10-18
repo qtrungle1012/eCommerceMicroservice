@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using SharedLibrarySolution.Logs;
-using System.Net;
 using System.Text.Json;
-
 
 namespace SharedLibrarySolution.Middleware
 {
@@ -20,58 +18,56 @@ namespace SharedLibrarySolution.Middleware
             try
             {
                 await _next(context);
-                switch (context.Response.StatusCode)
+
+                // ✅ Chỉ ghi response nếu chưa started
+                if (!context.Response.HasStarted)
                 {
-                    case StatusCodes.Status401Unauthorized:
-                        await ModifyHeader(context, "Unauthorized", "Authentication required or invalid token.", StatusCodes.Status401Unauthorized);
-                        break;
+                    switch (context.Response.StatusCode)
+                    {
+                        case StatusCodes.Status401Unauthorized:
+                            await WriteResponse(context, 401, "Unauthorized",
+                                "Authentication required or invalid token.");
+                            break;
 
-                    case StatusCodes.Status403Forbidden:
-                        await ModifyHeader(context, "Forbidden", "You do not have permission to access this resource.", StatusCodes.Status403Forbidden);
-                        break;
+                        case StatusCodes.Status403Forbidden:
+                            await WriteResponse(context, 403, "Forbidden",
+                                "You do not have permission to access this resource.");
+                            break;
 
-                    case StatusCodes.Status404NotFound:
-                        await ModifyHeader(context, "Not Found", "The requested resource could not be found.", StatusCodes.Status404NotFound);
-                        break;
+                        case StatusCodes.Status404NotFound:
+                            await WriteResponse(context, 404, "Not Found",
+                                "The requested resource could not be found.");
+                            break;
 
-                    case StatusCodes.Status429TooManyRequests:
-                        await ModifyHeader(context, "Warning", "Too many requests !", StatusCodes.Status429TooManyRequests);
-                        break;
+                        case StatusCodes.Status429TooManyRequests:
+                            await WriteResponse(context, 429, "Warning",
+                                "Too many requests!");
+                            break;
+                    }
                 }
             }
             catch (Exception ex)
             {
                 LogException.LogError(ex);
-
                 await HandleExceptionAsync(context, ex);
-
-                if (ex is TaskCanceledException || ex is TimeoutException)
-                {
-                    await ModifyHeader(context, "Out of time", "Request time out !", StatusCodes.Status408RequestTimeout);
-                }
             }
         }
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            if (context.Response.HasStarted)
+                return;
 
-            var response = new
-            {
-                statusCode = context.Response.StatusCode,
-                title = "Error",
-                message = exception.Message // có thể thay = "Internal server error"
-            };
-
-            var json = JsonSerializer.Serialize(response);
-            await context.Response.WriteAsync(json);
+            await WriteResponse(context, 500, "Error", exception.Message);
         }
 
-        private static async Task ModifyHeader(HttpContext context, string title, string message, int statusCode)
+        private static async Task WriteResponse(HttpContext context, int statusCode, string title, string message)
         {
-            context.Response.ContentType = "application/json";
+            if (context.Response.HasStarted)
+                return;
+
             context.Response.StatusCode = statusCode;
+            context.Response.ContentType = "application/json";
 
             var response = new
             {

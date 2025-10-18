@@ -3,6 +3,7 @@ using Autofac.Extensions.DependencyInjection;
 using IdentityService.Application;
 using IdentityService.Infrastructure;
 using IdentityService.Presentation.Configuration;
+using SharedLibrarySolution.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,10 +25,11 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 // 4️⃣ Application layer + API versioning
 builder.Services.AddApplicationServices();
 builder.Services.AddApiVersioningConfiguration();
+builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddSwaggerDocumentation();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -36,9 +38,13 @@ app.UseInfrastructurePolicies();
 
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseMiddleware<GlobalException>();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllers();
 

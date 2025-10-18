@@ -63,7 +63,7 @@ namespace IdentityService.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshToken");
                 });
 
             modelBuilder.Entity("IdentityService.Domain.Entities.Role", b =>
@@ -129,6 +129,9 @@ namespace IdentityService.Infrastructure.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -138,22 +141,9 @@ namespace IdentityService.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("IdentityService.Domain.Entities.UserRole", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("UserId", "RoleId");
-
                     b.HasIndex("RoleId");
 
-                    b.ToTable("UserRoles");
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("IdentityService.Domain.Entities.RefreshToken", b =>
@@ -186,23 +176,15 @@ namespace IdentityService.Infrastructure.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("IdentityService.Domain.Entities.UserRole", b =>
+            modelBuilder.Entity("IdentityService.Domain.Entities.User", b =>
                 {
                     b.HasOne("IdentityService.Domain.Entities.Role", "Role")
-                        .WithMany("UserRoles")
+                        .WithMany("Users")
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("IdentityService.Domain.Entities.User", "User")
-                        .WithMany("UserRoles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Role");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("IdentityService.Domain.Entities.Permission", b =>
@@ -214,14 +196,12 @@ namespace IdentityService.Infrastructure.Migrations
                 {
                     b.Navigation("RolePermissions");
 
-                    b.Navigation("UserRoles");
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("IdentityService.Domain.Entities.User", b =>
                 {
                     b.Navigation("RefreshTokens");
-
-                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

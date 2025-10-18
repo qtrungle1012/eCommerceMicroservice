@@ -12,8 +12,8 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
         public bool IsActive { get; set; } = true;
-
-        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+        public Guid RoleId { get; set; }
+        public Role Role { get; set; } = null!;
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
 }

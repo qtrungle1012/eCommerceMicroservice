@@ -59,22 +59,22 @@ namespace IdentityService.Infrastructure.Repositories
             }
         }
 
-        public async Task<Role?> GetByAsync(Expression<Func<Role, bool>> predicate)
-        {
-            try
-            {
-                var user = await _context.Roles.AsNoTracking().FirstOrDefaultAsync(predicate);
-                if (user == null)
-                    throw new AppException("Role not found");
+        //public async Task<Role?> GetByAsync(Expression<Func<Role, bool>> predicate)
+        //{
+        //    try
+        //    {
+        //        var user = await _context.Roles.AsNoTracking().FirstOrDefaultAsync(predicate);
+        //        if (user == null)
+        //            throw new AppException("Role not found");
 
-                return user;
-            }
-            catch (Exception ex)
-            {
-                LogException.LogError(ex);
-                throw;
-            }
-        }
+        //        return user;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        LogException.LogError(ex);
+        //        throw;
+        //    }
+        //}
 
         public async Task<Role?> GetByIdAsync(Guid id)
         {

@@ -42,12 +42,21 @@ namespace IdentityService.Infrastructure.Service
 
         private (string Token, DateTime Expiration) GenerateAccessToken(User user)
         {
-            var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey);
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.SecretKey); // lấy secret key để tạo token
+            
+            // lấy user permission để add vào scope dể protect các api
+            var permissions = user.Role.RolePermissions
+                .Select(rp=>rp.Permission.Name).ToList();
+
+            // gộp các permission lại 
+            var scopeValue = string.Join(" ", permissions);
 
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName)
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim("role", user.Role.Name), // lấy user role để lúc decode trả về role để protect các api
+                new("scope", scopeValue) // add các permission vào token
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor

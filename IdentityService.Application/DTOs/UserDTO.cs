@@ -13,5 +13,6 @@ namespace IdentityService.Application.DTOs
         public string? Address { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
+        public RoleDTO Role { get; set; } = null!;
     }
 }
