@@ -29,7 +29,7 @@ namespace IdentityService.Presentation.Configuration
                 }
 
                 options.RoutePrefix = "swagger";
-                options.DocumentTitle = "Stock API Documentation";
+                options.DocumentTitle = "ECommerce - Auth API Documentation";
                 options.DisplayRequestDuration();
             });
 

@@ -19,7 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityService.Infrastruct
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityService.Presentation", "IdentityService.Presentation\IdentityService.Presentation.csproj", "{B9960EB4-27D1-46C8-9FDC-0F20774AFACA}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateway", "ApiGateway", "{DB59D730-7ADE-460E-A5DB-A3550766BEF3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ApiGateway", "ApiGateway", "{C5F5EF2E-DAD6-49C7-B08C-1B942752CE4C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiGateway.Presentation", "ApiGateway.Presentation\ApiGateway.Presentation.csproj", "{647A9B17-4255-49A6-84C3-A21930126F5F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +49,10 @@ Global
 		{B9960EB4-27D1-46C8-9FDC-0F20774AFACA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9960EB4-27D1-46C8-9FDC-0F20774AFACA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9960EB4-27D1-46C8-9FDC-0F20774AFACA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{647A9B17-4255-49A6-84C3-A21930126F5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{647A9B17-4255-49A6-84C3-A21930126F5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{647A9B17-4255-49A6-84C3-A21930126F5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{647A9B17-4255-49A6-84C3-A21930126F5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -57,6 +63,7 @@ Global
 		{4A6DEDC4-0939-4615-8F18-4CD266DDF0E4} = {3601A653-5A11-42CC-8FC2-903121A13647}
 		{16F0B3CE-96D1-4152-8525-8D689EC94415} = {3601A653-5A11-42CC-8FC2-903121A13647}
 		{B9960EB4-27D1-46C8-9FDC-0F20774AFACA} = {3601A653-5A11-42CC-8FC2-903121A13647}
+		{647A9B17-4255-49A6-84C3-A21930126F5F} = {C5F5EF2E-DAD6-49C7-B08C-1B942752CE4C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DB619522-D28B-410E-B7D8-941F3050D8F7}

@@ -9,6 +9,8 @@ namespace SharedLibrarySolution.Middleware
         private const string GatewayHeader = "Api-Gateway";
         private const string ExpectedHeaderValue = "my-gateway";
 
+        // bắt buộc những request phải có header Api-Gateway: my-gateway 
+        // Ý tưởng: bảo vệ service chỉ cho gateway gọi, tránh gọi trực tiếp từ bên ngoài.
         public ListenToOnlyApiGateway(RequestDelegate next)
         {
             _next = next;

@@ -3,25 +3,31 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 namespace SharedLibrarySolution.DependencyInjection
 {
     public static class JWTAuthenticationScheme
     {
-        //"JwtSettings": {
-        //"SecretKey": "my_super_secret_key_123",
-        //"Issuer": "MyAuthServer",
-        //"Audience": "MyClientApp"
-        //} cần để cấu hình ở mỗi service để có thể sử dụng lớp này -> builder.Services.AddJWTAuthenticationScheme(builder.Configuration);
+        // Cấu hình cần có trong appsettings.json:
+        // "JwtSettings": {
+        //   "SecretKey": "my_super_secret_key_123",
+        //   "Issuer": "MyAuthServer",
+        //   "Audience": "MyClientApp"
+        // }
 
-        public static IServiceCollection AddJWTAuthenticationScheme(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddJWTAuthenticationScheme(
+            this IServiceCollection services,
+            IConfiguration configuration)
         {
-            var jwtSettings = configuration.GetSection("JwtSettings"); // lấy cấu hình jwt trong json
-
+            var jwtSettings = configuration.GetSection("JwtSettings");
             var secretKey = jwtSettings["SecretKey"];
             var issuer = jwtSettings["Issuer"];
             var audience = jwtSettings["Audience"];
 
+            var key = Encoding.ASCII.GetBytes(secretKey!);
+
+            // Authentication
             services
                 .AddAuthentication(options =>
                 {
@@ -40,10 +46,23 @@ namespace SharedLibrarySolution.DependencyInjection
                         ValidateIssuerSigningKey = true,
                         ValidIssuer = issuer,
                         ValidAudience = audience,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey!)),
-                        ClockSkew = TimeSpan.Zero
+                        IssuerSigningKey = new SymmetricSecurityKey(key),
+                        ClockSkew = TimeSpan.Zero,
+                        NameClaimType = ClaimTypes.NameIdentifier,
+                        RoleClaimType = ClaimTypes.Role
                     };
                 });
+
+            // Authorization
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireAdminRole", policy =>
+                    policy.RequireRole("ADMIN"));
+                options.AddPolicy("RequireSellerRole", policy =>
+                    policy.RequireRole("SELLER"));
+                options.AddPolicy("RequireUserRole", policy =>
+                    policy.RequireRole("USER"));
+            });
 
             return services;
         }

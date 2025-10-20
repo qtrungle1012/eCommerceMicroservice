@@ -51,12 +51,12 @@ namespace IdentityService.Presentation.Configuration
         {
             var info = new OpenApiInfo
             {
-                Title = "Stock API",
+                Title = "Identity Service API",
                 Version = description.ApiVersion.ToString(),
                 Description = "A comprehensive Stock Management API",
                 Contact = new OpenApiContact
                 {
-                    Name = "Stock API Team",
+                    Name = "Identity Service API Team",
                     Email = "support@stockapi.com"
                 }
             };

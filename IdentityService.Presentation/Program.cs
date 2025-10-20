@@ -3,6 +3,7 @@ using Autofac.Extensions.DependencyInjection;
 using IdentityService.Application;
 using IdentityService.Infrastructure;
 using IdentityService.Presentation.Configuration;
+using SharedLibrarySolution.DependencyInjection;
 using SharedLibrarySolution.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,10 +26,14 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 // 4️⃣ Application layer + API versioning
 builder.Services.AddApplicationServices();
 builder.Services.AddApiVersioningConfiguration();
-builder.Services.AddJwtAuthentication(builder.Configuration);
+builder.Services.AddJWTAuthenticationScheme(builder.Configuration);
 builder.Services.AddSwaggerDocumentation();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Conventions.Insert(0, new RoutePrefixConvention("identity"));
+});
+
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
