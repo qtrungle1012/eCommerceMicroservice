@@ -10,6 +10,8 @@ namespace IdentityService.Application.Interfaces.IRepositories
         Task InvalidateAsync(RefreshToken refreshToken);
         Task RevokeAllUserTokensAsync(Guid userId);
         Task DeleteExpiredTokensAsync();
+        Task<RefreshToken?> GetByUserIdAsync(Guid userId);
+
 
     }
 }

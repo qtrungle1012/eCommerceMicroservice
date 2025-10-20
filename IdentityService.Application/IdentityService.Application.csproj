@@ -13,11 +13,8 @@
 
   <ItemGroup>
     <Folder Include="Common\Behaviours\" />
-    <Folder Include="Features\Auth\Command\Logout\" />
-    <Folder Include="Features\Auth\Command\RefreshToken\" />
-    <Folder Include="Features\Auth\Queries\" />
     <Folder Include="Features\Permission\" />
-    <Folder Include="Features\Role\" />
+    <Folder Include="Features\Role\Commands\" />
   </ItemGroup>
 
   <ItemGroup>

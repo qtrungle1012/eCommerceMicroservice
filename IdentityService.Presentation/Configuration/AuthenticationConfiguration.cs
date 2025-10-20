@@ -1,6 +1,7 @@
 ﻿using IdentityService.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using System.Text;
 
 namespace IdentityService.Presentation.Configuration
@@ -32,38 +33,12 @@ namespace IdentityService.Presentation.Configuration
                     ValidAudience = jwtSettings.Audience,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ClockSkew = TimeSpan.Zero,
-                    RoleClaimType = "role" // dùng claim "role" để check policy
+                    NameClaimType = ClaimTypes.NameIdentifier,
+                    RoleClaimType = ClaimTypes.Role // lấy role để có thể đăng nhập các api có phân quyền
                 };
-
-                //options.Events = new JwtBearerEvents
-                //{
-                //    OnChallenge = async context =>
-                //    {
-                //        context.HandleResponse(); // chặn default 401
-                //        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                //        context.Response.ContentType = "application/json";
-
-                //        await context.Response.WriteAsJsonAsync(new
-                //        {
-                //            Code = 401,
-                //            Message = "Unauthorized: token missing or invalid"
-                //        });
-                //    },
-                //    OnForbidden = async context =>
-                //    {
-                //        context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                //        context.Response.ContentType = "application/json";
-
-                //        await context.Response.WriteAsJsonAsync(new
-                //        {
-                //            Code = 403,
-                //            Message = "Forbidden: you do not have permission"
-                //        });
-                //    }
-                //};
             });
 
-            // 3️⃣ Authorization (role-based + placeholder scope-based)
+            // Authorization (role-based + placeholder scope-based)
             services.AddAuthorization(options =>
             {
                 // Role-based policies

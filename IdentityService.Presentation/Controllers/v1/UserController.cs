@@ -35,6 +35,7 @@ namespace IdentityService.Presentation.Controllers.v1
 
         // GET: /api/v1/user/{id}
         [HttpGet("{id:guid}")]
+        [Authorize]
         public async Task<IActionResult> GetUserById(Guid id)
         {
             var result = await _mediator.Send(new GetUserByIdQuery { Id = id });
@@ -51,6 +52,7 @@ namespace IdentityService.Presentation.Controllers.v1
 
         // PUT: /api/v1/user/{id}
         [HttpPut("{id:guid}")]
+        [Authorize]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserCommand command)
         {
             // đảm bảo id trong URL khớp với command
@@ -61,6 +63,8 @@ namespace IdentityService.Presentation.Controllers.v1
 
         // DELETE: /api/v1/user/{id}
         [HttpDelete("{id:guid}")]
+        [Authorize(Roles = "ADMIN")]
+
         public async Task<IActionResult> DeleteUser(Guid id)
         {
             await _mediator.Send(new DeleteUserCommand { Id = id });

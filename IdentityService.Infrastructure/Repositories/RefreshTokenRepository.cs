@@ -34,6 +34,14 @@ namespace IdentityService.Infrastructure.Repositories
             return await _context.RefreshToken.FirstOrDefaultAsync(x => x.Token == token);
         }
 
+        //lấy refresh token của user trước khi đăng xuất
+        public async Task<RefreshToken?> GetByUserIdAsync(Guid userId)
+        {
+            var token = await _context.RefreshToken
+                    .FirstOrDefaultAsync(x => x.UserId == userId && !x.IsRevoked);
+            return token;
+        }
+
         public async Task InvalidateAsync(RefreshToken refreshToken)
         {
             refreshToken.IsRevoked = true;
