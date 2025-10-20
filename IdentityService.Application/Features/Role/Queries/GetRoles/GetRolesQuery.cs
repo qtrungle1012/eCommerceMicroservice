@@ -3,7 +3,7 @@ using MediatR;
 
 namespace IdentityService.Application.Features.Role.Queries.GetRoles
 {
-    public class GetRolesQuery : IRequest<List<RoleDTO>> { }
+    public class GetRolesQuery : IRequest<List<RoleDTO>>
     {
     }
 }
