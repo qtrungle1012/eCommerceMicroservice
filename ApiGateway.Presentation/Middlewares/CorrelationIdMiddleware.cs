@@ -1,5 +1,6 @@
 ﻿namespace ApiGateway.Presentation.Middlewares
 {
+    //theo dõi (trace) toàn bộ request xuyên suốt các service.
     public sealed class CorrelationIdMiddleware
     {
         private readonly RequestDelegate _next;

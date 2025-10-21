@@ -14,7 +14,6 @@ namespace SharedLibrarySolution.Middleware
         {
              "/swagger",
             "/identity/swagger/default/swagger.json",
-            "/health"
         };
 
         public ListenToOnlyApiGateway(RequestDelegate next)

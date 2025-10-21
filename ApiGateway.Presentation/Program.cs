@@ -14,6 +14,7 @@ var app = builder.Build();
 // Custom middleware
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseSharedLogging();
+app.UseSharedPolicies(); // shared middleware cho Gateway có global exception
 
 // Swagger UI đa endpoint
 app.UseSwagger();

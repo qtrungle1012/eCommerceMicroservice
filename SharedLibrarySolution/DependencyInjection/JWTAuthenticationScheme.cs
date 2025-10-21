@@ -27,7 +27,7 @@ namespace SharedLibrarySolution.DependencyInjection
 
             var key = Encoding.ASCII.GetBytes(secretKey!);
 
-            // Authentication
+            // cấu hình Authentication = chứng thực
             services
                 .AddAuthentication(options =>
                 {
@@ -53,7 +53,7 @@ namespace SharedLibrarySolution.DependencyInjection
                     };
                 });
 
-            // Authorization
+            // Authorization = phân quyền
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("RequireAdminRole", policy =>

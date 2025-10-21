@@ -14,11 +14,6 @@ namespace SharedLibrarySolution.DependencyInjection
                     IConfiguration configuration,
                     string fileName) where TContext : DbContext
         {
-            // add database context
-            services.AddDbContext<TContext>(option => option.UseSqlServer(
-                configuration.GetConnectionString("eCommerceConnection"), sqlserverOption =>
-                sqlserverOption.EnableRetryOnFailure()
-            ));
             // serilog config
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()

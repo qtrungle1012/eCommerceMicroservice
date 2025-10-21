@@ -2,21 +2,29 @@
 using Autofac.Extensions.DependencyInjection;
 using IdentityService.Application;
 using IdentityService.Infrastructure;
+using IdentityService.Infrastructure.Security;
 using IdentityService.Presentation.Configuration;
 using SharedLibrarySolution.DependencyInjection;
 using SharedLibrarySolution.Middleware;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebApplication.CreateBuilder(args); // khỏi tạo đối tượng để đăng ký các DI, middleware, service container.
 
-// 🔹 Dùng Autofac
+// Dùng Autofac để DI tự động không cần khai báo
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
+
+// đọc cấu hình jwt để AddJWTAuthenticationScheme sử dụng
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+
 // 🔹 Đăng ký các tầng
-builder.Services.AddInfrastructureServices(builder.Configuration);
-builder.Services.AddApplicationServices();
-builder.Services.AddJWTAuthenticationScheme(builder.Configuration);
-builder.Services.AddControllers();
-builder.Services.AddSwaggerDocumentation();
+builder.Services.AddInfrastructureServices(builder.Configuration); // kết nối database
+builder.Services.AddApplicationServices(); // cấu hình MediatR, AutoMapper hoặc Validator.
+builder.Services.AddJWTAuthenticationScheme(builder.Configuration); // cấu hình Cấu hình middleware xác thực.
+
+
+builder.Services.AddControllers();// cho phép định nghĩa các controller
+builder.Services.AddSwaggerDocumentation(); 
 
 // 🔹 Autofac Container
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
@@ -27,10 +35,11 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
         .InstancePerLifetimeScope();
 });
 
-var app = builder.Build();
+var app = builder.Build(); // tạo app xong chạy qua các middleware
 
 // 🔹 Global Exception Middleware
-app.UseMiddleware<GlobalException>();
+//app.UseMiddleware<GlobalException>();
+app.UseSharedPoliciesForBackendServices(); // vừa có GlobalException vừa có chặn các request với header k phải gateway
 
 // 🔹 Swagger
 app.UseSwaggerDocumentation();
