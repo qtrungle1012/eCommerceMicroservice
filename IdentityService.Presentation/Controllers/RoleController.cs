@@ -1,4 +1,4 @@
-﻿namespace IdentityService.Presentation.Controllers.v1
+﻿namespace IdentityService.Presentation.Controllers
 {
     public class RoleController
     {

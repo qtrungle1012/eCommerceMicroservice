@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ApiExplorer;
+﻿using Microsoft.OpenApi.Models;
 
 namespace IdentityService.Presentation.Configuration
 {
@@ -9,27 +9,51 @@ namespace IdentityService.Presentation.Configuration
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
             services.ConfigureOptions<ConfigureSwaggerOptions>();
-
             return services;
         }
 
-        public static IApplicationBuilder UseSwaggerDocumentation(
-            this IApplicationBuilder app,
-            IApiVersionDescriptionProvider provider)
+        public static IApplicationBuilder UseSwaggerDocumentation(this IApplicationBuilder app)
         {
-            app.UseSwagger();
+            // cấu hình dùng cho cả gateway và cả của identity service
+            app.UseSwagger(c =>
+            {
+                c.PreSerializeFilters.Add((doc, req) =>
+                {
+                    var isViaGateway = req.Host.Port == 8888 ||
+                                       req.Headers.ContainsKey("X-Forwarded-Prefix") ||
+                                       req.Headers["Referer"].ToString().Contains(":8888");
+
+                    if (isViaGateway)
+                    {
+                        doc.Servers = new List<OpenApiServer>
+                {
+                    new OpenApiServer
+                    {
+                        Url = "http://localhost:8888/identity",
+                        Description = "Via Gateway"
+                    }
+                };
+                    }
+                    else
+                    {
+                        doc.Servers = new List<OpenApiServer>
+                {
+                    new OpenApiServer
+                    {
+                        Url = $"{req.Scheme}://{req.Host.Value}",
+                        Description = "Direct Access"
+                    }
+                };
+                    }
+                });
+            });
+
             app.UseSwaggerUI(options =>
             {
-                // Tạo endpoint cho từng version
-                foreach (var description in provider.ApiVersionDescriptions.Reverse())
-                {
-                    options.SwaggerEndpoint(
-                        $"/swagger/{description.GroupName}/swagger.json",
-                        description.GroupName.ToUpperInvariant());
-                }
-
-                options.RoutePrefix = "swagger";
-                options.DocumentTitle = "ECommerce - Auth API Documentation";
+                // Gọi swagger.json không có version
+                options.SwaggerEndpoint("/swagger/default/swagger.json", "Identity Service API");
+                options.RoutePrefix = "swagger"; // => /swagger
+                options.DocumentTitle = "E-Commerce Identity API Documentation";
                 options.DisplayRequestDuration();
             });
 

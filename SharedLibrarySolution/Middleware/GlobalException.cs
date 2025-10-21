@@ -55,11 +55,26 @@ namespace SharedLibrarySolution.Middleware
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            if (context.Response.HasStarted)
-                return;
+            var cid = context.Items["X-Correlation-ID"]?.ToString();
+            if (!context.Response.HasStarted)
+            {
+                context.Response.StatusCode = 500;
+                context.Response.ContentType = "application/json";
 
-            await WriteResponse(context, 500, "Error", exception.Message);
+                var response = new
+                {
+                    statusCode = 500,
+                    title = "Internal Server Error",
+                    correlationId = cid,
+                    traceId = context.TraceIdentifier,
+                    detail = exception.Message
+                };
+
+                await context.Response.WriteAsync(JsonSerializer.Serialize(response,
+                    new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+            }
         }
+
 
         private static async Task WriteResponse(HttpContext context, int statusCode, string title, string message)
         {

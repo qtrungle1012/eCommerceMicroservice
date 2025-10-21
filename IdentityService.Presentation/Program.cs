@@ -8,13 +8,17 @@ using SharedLibrarySolution.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1️⃣ Sử dụng Autofac
+// 🔹 Dùng Autofac
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
-// 2️⃣ Đăng ký DbContext + JwtSettings (Infrastructure)
+// 🔹 Đăng ký các tầng
 builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddApplicationServices();
+builder.Services.AddJWTAuthenticationScheme(builder.Configuration);
+builder.Services.AddControllers();
+builder.Services.AddSwaggerDocumentation();
 
-// 3️⃣ Register Autofac container cho Repository, Service, Hasher
+// 🔹 Autofac Container
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
     containerBuilder.RegisterAssemblyTypes(typeof(IdentityService.Infrastructure.ConfigureServices).Assembly)
@@ -23,34 +27,19 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
         .InstancePerLifetimeScope();
 });
 
-// 4️⃣ Application layer + API versioning
-builder.Services.AddApplicationServices();
-builder.Services.AddApiVersioningConfiguration();
-builder.Services.AddJWTAuthenticationScheme(builder.Configuration);
-builder.Services.AddSwaggerDocumentation();
-
-builder.Services.AddControllers(options =>
-{
-    options.Conventions.Insert(0, new RoutePrefixConvention("identity"));
-});
-
-builder.Services.AddEndpointsApiExplorer();
-
 var app = builder.Build();
 
-// 5️⃣ Middleware chung
-app.UseInfrastructurePolicies();
-
-app.UseSwagger();
-app.UseSwaggerUI();
+// 🔹 Global Exception Middleware
 app.UseMiddleware<GlobalException>();
 
-app.UseHttpsRedirection();
+// 🔹 Swagger
+app.UseSwaggerDocumentation();
 
+// 🔹 Auth
 app.UseAuthentication();
 app.UseAuthorization();
 
-
+// 🔹 Map Controllers
 app.MapControllers();
 
 app.Run();

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
+using SharedLibrarySolution.Logs;
 using SharedLibrarySolution.Middleware;
 
 namespace SharedLibrarySolution.DependencyInjection
@@ -35,15 +36,35 @@ namespace SharedLibrarySolution.DependencyInjection
 
             return services;
         }
-
-        public static IApplicationBuilder UseSharedPolicies(this IApplicationBuilder app)
+        /// <summary>
+        /// Middleware: log request/response + exception + CID + elapsed time
+        /// </summary>
+        public static IApplicationBuilder UseSharedLogging(this IApplicationBuilder app)
         {
-            app.UseMiddleware<GlobalException>();
-
-            //app.UseMiddleware<ListenToOnlyApiGateway>();
-
+            app.Use(async (context, next) =>
+            {
+                await LogException.HandleRequestAsync(context, next);
+            });
             return app;
         }
 
+        /// <summary>
+        /// Sử dụng cho API Gateway - CHỈ có GlobalException
+        /// </summary>
+        public static IApplicationBuilder UseSharedPolicies(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<GlobalException>();
+            return app;
+        }
+
+        /// <summary>
+        /// Sử dụng cho Backend Services - có cả GlobalException và ListenToOnlyApiGateway
+        /// </summary>
+        public static IApplicationBuilder UseSharedPoliciesForBackendServices(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<GlobalException>();
+            app.UseMiddleware<ListenToOnlyApiGateway>();
+            return app;
+        }
     }
 }

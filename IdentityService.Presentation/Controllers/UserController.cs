@@ -9,11 +9,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SharedLibrarySolution.Responses;
 
-namespace IdentityService.Presentation.Controllers.v1
+namespace IdentityService.Presentation.Controllers
 {
     [ApiController]
-    [ApiVersion("1.0")]
-    [Route("api/v{version:apiVersion}/[controller]")]
+    //[ApiVersion("1.0")]
+    [Route("user")]
     public class UserController : ControllerBase
     {
         private readonly IMediator _mediator;

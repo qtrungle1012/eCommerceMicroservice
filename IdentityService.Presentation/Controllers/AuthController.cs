@@ -1,22 +1,19 @@
-﻿using Azure.Core;
-using IdentityService.Application.DTOs;
+﻿using IdentityService.Application.DTOs;
 using IdentityService.Application.Features.Auth.Command.Login;
 using IdentityService.Application.Features.Auth.Command.Logout;
 using IdentityService.Application.Features.Auth.Command.RefreshToken;
-using IdentityService.Application.Features.User.Commands.DeleteUser;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using SharedLibrarySolution.Responses;
 using System.Security.Claims;
 
-namespace IdentityService.Presentation.Controllers.v1
+namespace IdentityService.Presentation.Controllers
 {
-    [Route("api/v{version:apiVersion}/[controller]")]
+    [Route("auth")]
     //[Route("api/v{version:apiVersion}/auth")]
     [ApiController]
-    [ApiVersion("1.0")]
+    //[ApiVersion("1.0")]
     public class AuthController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -41,7 +38,7 @@ namespace IdentityService.Presentation.Controllers.v1
         public async Task<IActionResult> Logout()
         {
             // Lấy userId từ claim trong access token để đăng xuất
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (userId == null)
                 return Unauthorized(new { message = "Invalid token" });

@@ -39,10 +39,13 @@ namespace IdentityService.Infrastructure
             return services;
         }
 
+        /// <summary>
+        /// Sử dụng middleware cho Backend Service (có ListenToOnlyApiGateway)
+        /// </summary>
         public static IApplicationBuilder UseInfrastructurePolicies(this IApplicationBuilder app)
         {
-            // Middleware chung (global exception, listen gateway,...)
-            SharedServiceContainer.UseSharedPolicies(app);
+            // ✅ Sử dụng middleware dành cho backend services
+            SharedServiceContainer.UseSharedPoliciesForBackendServices(app);
             return app;
         }
     }

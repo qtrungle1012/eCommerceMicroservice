@@ -1,25 +1,45 @@
-﻿var builder = WebApplication.CreateBuilder(args);
+﻿using ApiGateway.Presentation.Middlewares;
+using SharedLibrarySolution.DependencyInjection;
 
-// Add services to the container.
+var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Custom middleware
+app.UseMiddleware<CorrelationIdMiddleware>();
+app.UseSharedLogging();
+
+// Swagger UI đa endpoint
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    var endpoints = builder.Configuration.GetSection("SwaggerEndpoints")
+        .Get<List<SwaggerEndpoint>>() ?? new List<SwaggerEndpoint>();
 
-app.UseHttpsRedirection();
+    foreach (var endpoint in endpoints)
+    {
+        // Nếu user truy cập gateway ở port 8888, giữ nguyên URL gateway
+        // => load đúng swagger.json qua YARP
+        c.SwaggerEndpoint(endpoint.Url, endpoint.Name);
+    }
 
-app.UseAuthorization();
+    c.DocumentTitle = "E-Commerce Gateway API Docs";
+    c.RoutePrefix = "swagger"; // => http://localhost:8888/swagger
+});
 
-app.MapControllers();
+// Reverse proxy
+app.MapReverseProxy();
 
 app.Run();
+
+public class SwaggerEndpoint
+{
+    public string Name { get; set; } = string.Empty;
+    public string Url { get; set; } = string.Empty;
+}

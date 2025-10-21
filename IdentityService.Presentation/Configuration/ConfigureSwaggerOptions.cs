@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -7,20 +6,21 @@ namespace IdentityService.Presentation.Configuration
 {
     public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
     {
-        private readonly IApiVersionDescriptionProvider _provider;
-
-        public ConfigureSwaggerOptions(IApiVersionDescriptionProvider provider)
-        {
-            _provider = provider;
-        }
-
         public void Configure(SwaggerGenOptions options)
         {
-            foreach (var description in _provider.ApiVersionDescriptions)
+            // 1 doc duy nhất, không có version
+            options.SwaggerDoc("default", new OpenApiInfo
             {
-                options.SwaggerDoc(description.GroupName, CreateInfoForApiVersion(description));
-            }
+                Title = "Identity Service API",
+                Description = "Authentication and Authorization API for the E-Commerce system",
+                Contact = new OpenApiContact
+                {
+                    Name = "Identity Service API Team",
+                    Email = "support@stockapi.com"
+                }
+            });
 
+            // JWT Bearer setup
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
@@ -45,28 +45,6 @@ namespace IdentityService.Presentation.Configuration
                     Array.Empty<string>()
                 }
             });
-        }
-
-        private static OpenApiInfo CreateInfoForApiVersion(ApiVersionDescription description)
-        {
-            var info = new OpenApiInfo
-            {
-                Title = "Identity Service API",
-                Version = description.ApiVersion.ToString(),
-                Description = "A comprehensive Stock Management API",
-                Contact = new OpenApiContact
-                {
-                    Name = "Identity Service API Team",
-                    Email = "support@stockapi.com"
-                }
-            };
-
-            if (description.IsDeprecated)
-            {
-                info.Description += " (This API version has been deprecated)";
-            }
-
-            return info;
         }
     }
 }
