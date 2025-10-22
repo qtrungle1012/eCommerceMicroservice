@@ -8,11 +8,11 @@ namespace IdentityService.Infrastructure.Data
         public IdentityDbContext(DbContextOptions<IdentityDbContext> options)
             : base(options) { }
 
-        public DbSet<User> Users { get; set; }
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<Permission> Permissions { get; set; }
-        public DbSet<RolePermission> RolePermissions { get; set; }
-        public DbSet<RefreshToken> RefreshToken { get; set; }
+        public DbSet<User> Users { get; set; } = null!;
+        public DbSet<Role> Roles { get; set; } = null!;
+        public DbSet<Permission> Permissions { get; set; } = null!;
+        public DbSet<RolePermission> RolePermissions { get; set; } = null!;
+        public DbSet<RefreshToken> RefreshToken { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,7 +31,7 @@ namespace IdentityService.Infrastructure.Data
                 .WithMany(p => p.RolePermissions)
                 .HasForeignKey(rp => rp.PermissionId);
 
-            // ⚙️ User - Role: quan hệ 1-n (1 role có nhiều user)
+            // User - Role: quan hệ 1-n (1 role có nhiều user)
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)

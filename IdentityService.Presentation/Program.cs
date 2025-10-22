@@ -5,7 +5,7 @@ using IdentityService.Infrastructure;
 using IdentityService.Infrastructure.Security;
 using IdentityService.Presentation.Configuration;
 using SharedLibrarySolution.DependencyInjection;
-using SharedLibrarySolution.Middleware;
+
 
 var builder = WebApplication.CreateBuilder(args); // khỏi tạo đối tượng để đăng ký các DI, middleware, service container.
 
@@ -38,7 +38,6 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 var app = builder.Build(); // tạo app xong chạy qua các middleware
 
 // 🔹 Global Exception Middleware
-//app.UseMiddleware<GlobalException>();
 app.UseSharedPoliciesForBackendServices(); // vừa có GlobalException vừa có chặn các request với header k phải gateway
 
 // 🔹 Swagger

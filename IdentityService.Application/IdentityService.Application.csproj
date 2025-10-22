@@ -7,12 +7,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Common\Behaviours\**" />
+    <EmbeddedResource Remove="Common\Behaviours\**" />
+    <None Remove="Common\Behaviours\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\IdentityService.Domain\IdentityService.Domain.csproj" />
     <ProjectReference Include="..\SharedLibrarySolution\SharedLibrarySolution.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Behaviours\" />
     <Folder Include="Features\Permission\" />
     <Folder Include="Features\Role\Commands\" />
   </ItemGroup>

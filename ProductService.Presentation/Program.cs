@@ -1,25 +1,51 @@
+﻿using ProductService.Presentation.Configurations;
+using ProductService.Presentation.Data;
+using ProductService.Presentation.Features.Products.GetProducts;
+using SharedLibrarySolution.DependencyInjection;
+using System.Reflection;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Đăng ký MongoDB Context
+builder.Services.AddSingleton<MongoDbContext>();
 
+// Đăng ký Handler
+builder.Services.AddScoped<GetProductsHandler>();
+
+//Khai báo AutoMapper, tìm MappingProfile trong Assembly(dự án này)
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+// Add services to the container.
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddSwaggerDocumentation();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+
+// Khởi tạo MongoDB (tạo DB, collections, indexes)
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var mongoContext = scope.ServiceProvider.GetRequiredService<MongoDbContext>();
+    await MongoDbInitializer.InitializeAsync(mongoContext);
 }
 
-app.UseHttpsRedirection();
 
+// 🔹 Global Exception Middleware
+app.UseSharedPoliciesForBackendServices(); // vừa có GlobalException vừa có chặn các request với header k phải gateway
+
+
+// 🔹 Swagger
+app.UseSwaggerDocumentation();
+
+// Chứng thực và phân quyền
+app.UseAuthentication();
 app.UseAuthorization();
+// Map Endpoints
 
-app.MapControllers();
+app.MapGetProductsEndpoint();
+
 
 app.Run();

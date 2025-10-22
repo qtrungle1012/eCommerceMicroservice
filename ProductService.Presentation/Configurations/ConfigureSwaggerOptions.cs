@@ -2,7 +2,7 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace IdentityService.Presentation.Configuration
+namespace ProductService.Presentation.Configurations
 {
     public class ConfigureSwaggerOptions : IConfigureOptions<SwaggerGenOptions>
     {
@@ -11,11 +11,11 @@ namespace IdentityService.Presentation.Configuration
             // 1 doc duy nhất, không có version
             options.SwaggerDoc("default", new OpenApiInfo
             {
-                Title = "Identity Service API",
+                Title = "Product Service API",
                 Description = "Authentication and Authorization API for the E-Commerce system",
                 Contact = new OpenApiContact
                 {
-                    Name = "Identity Service API Team",
+                    Name = "Product Service API Team",
                     Email = "support@ecommerceapi.com"
                 }
             });

@@ -6,7 +6,7 @@
         public int PageSize { get; set; }
         public int TotalItems { get; set; }
         public int TotalPages => (int)Math.Ceiling((double)TotalItems / PageSize);
-        public IEnumerable<T> Items { get; set; } = new List<T>();
+        public IEnumerable<T> Items { get; set; } = new List<T>(); // dùng IEnumerable vì chỉ đọc kh cập nhật, hữu ích khi làm việc với LINQ
 
         public PageResponse() { }
 
