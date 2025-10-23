@@ -10,7 +10,7 @@ namespace ProductService.Presentation.Data
             var db = context.Database;
 
             await ProductConfiguration.ConfigureAsync(db);
-            await CategoryConfiguration.ConfigureAsync(context);
+            await CategoryConfiguration.ConfigureAsync(db);
             await PromotionConfiguration.ConfigureAsync(context);
         }
     }

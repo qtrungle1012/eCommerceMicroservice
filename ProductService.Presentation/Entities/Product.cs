@@ -1,12 +1,19 @@
-﻿namespace ProductService.Presentation.Entities
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace ProductService.Presentation.Entities
 {
     public class Product
     {
-        public Guid Id { get; set; } // ObjectId trong MongoDB
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id { get; set; } = string.Empty; // ObjectId trong MongoDB
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }
-        public Guid CategoryId { get; set; } // Tham chiếu tới Categories
+
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string CategoryId { get; set; } = string.Empty; // Tham chiếu tới Categories
         public List<ProductVariant>? Variants { get; set; } // Nhúng biến thể
         public List<string>? ImageUrls { get; set; } // Nhúng danh sách ảnh
         public double RatingAverage { get; set; } // Tính từ Reviews

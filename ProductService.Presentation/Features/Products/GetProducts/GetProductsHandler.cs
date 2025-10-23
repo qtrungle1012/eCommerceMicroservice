@@ -21,14 +21,14 @@ namespace ProductService.Presentation.Features.Products.GetProducts
         {
             var pageNumber = query.PageNumber ?? 1;
             var pageSize = query.PageSize ?? 10;
-            var filter = Builders<Product>.Filter.Empty; // tạo một bộ lọc rỗng cho colection Product
+            var filter = Builders<Product>.Filter.Eq(p => p.IsDeleted, false); // tạo một bộ lọc rỗng cho colection Product
 
             if (!string.IsNullOrEmpty(query.Search))
                 filter &= Builders<Product>.Filter.Text(query.Search);
 
-            if (!string.IsNullOrEmpty(query.CategoryId) && Guid.TryParse(query.CategoryId, out Guid categoryId))
+            if (!string.IsNullOrEmpty(query.CategoryId))
             {
-                filter &= Builders<Product>.Filter.Eq(p => p.CategoryId, categoryId);
+                filter &= Builders<Entities.Product>.Filter.Eq(p => p.CategoryId, query.CategoryId);
             }
 
             //tổng sản phẩm

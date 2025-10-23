@@ -1,16 +1,12 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using ProductService.Presentation.Common.Mapping;
+using ProductService.Presentation.Entities;
 
-namespace ProductService.Presentation.Entities
+namespace ProductService.Presentation.Features.Categories
 {
-    public class Category
+    public class CategoryResponse : IMapFrom<Category>
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
-
-        [BsonRepresentation(BsonType.ObjectId)]
         public string ParentId { get; set; } = string.Empty; //danh mục cha-con - hỗ trợ danh mục lồng nhau
         public bool IsDeleted { get; set; } = false;
         public DateTime? DeletedAt { get; set; }

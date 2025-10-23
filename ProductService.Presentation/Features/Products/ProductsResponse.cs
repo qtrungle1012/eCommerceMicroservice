@@ -12,11 +12,11 @@ namespace ProductService.Presentation.Features.Products
 
     public class ProductsResponse : IMapFrom<Product>
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         public decimal Price { get; set; }
-        public Guid CategoryId { get; set; }
+        public string CategoryId { get; set; } = string.Empty;
         public double RatingAverage { get; set; }
         public List<string> ImageUrls { get; set; } = new();
         public List<ProductVariantResponse> Variants { get; set; } = new(); 

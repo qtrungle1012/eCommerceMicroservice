@@ -1,8 +1,4 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Conventions;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using ProductService.Presentation.Entities;
 
 namespace ProductService.Presentation.Data
@@ -10,14 +6,9 @@ namespace ProductService.Presentation.Data
     public class MongoDbContext
     {
         private readonly IMongoDatabase _database;
-        private static bool _isConfigured = false;
-        private static readonly object _lock = new object();
 
         public MongoDbContext(IConfiguration configuration)
         {
-            // GỌI ConfigureGuidSerialization TRƯỚC KHI làm gì khác
-            ConfigureGuidSerialization();
-
             var connectionString = configuration.GetConnectionString("MongoDb");
             var dbName = configuration["DatabaseSettings:DatabaseName"];
 
@@ -26,30 +17,7 @@ namespace ProductService.Presentation.Data
             EnsureCollectionsExist();
         }
 
-        // Cấu hình cách MongoDB serialize Guid (chỉ chạy 1 lần duy nhất)
-        private static void ConfigureGuidSerialization()
-        {
-            if (_isConfigured) return;
-
-            lock (_lock)
-            {
-                if (_isConfigured) return;
-
-                // Cấu hình Guid serialization cho toàn bộ ứng dụng
-                BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
-
-                // Dùng Convention
-                var pack = new ConventionPack
-                {
-                    new EnumRepresentationConvention(BsonType.String), // Enum lưu dạng string
-                    new IgnoreExtraElementsConvention(true) // Bỏ qua field thừa
-                };
-                ConventionRegistry.Register("MyConventions", pack, t => true);
-
-                _isConfigured = true;
-            }
-        }
-
+      
         // Đảm bảo tạo db nếu chưa có
         private void EnsureCollectionsExist()
         {

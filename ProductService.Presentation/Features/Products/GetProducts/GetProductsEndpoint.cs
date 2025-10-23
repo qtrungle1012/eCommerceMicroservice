@@ -15,7 +15,6 @@ namespace ProductService.Presentation.Features.Products.GetProducts
                 return Results.Ok(response);
             })
             .WithTags("Products")
-            .WithName("GetProducts")
 
             .Produces<ApiResponse<PageResponse<ProductsResponse>>>(StatusCodes.Status200OK);
         }
