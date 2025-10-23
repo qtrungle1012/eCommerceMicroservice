@@ -61,6 +61,7 @@ namespace ProductService.Presentation.Features.Products.CreateProduct
                     );
                 }
             })
+            .RequireAuthorization("RequireAdminRole", "RequireSellerRole")
             .WithTags("Products")
             .WithName("CreateProduct")
             .Accepts<CreateProductRequest>("multipart/form-data")

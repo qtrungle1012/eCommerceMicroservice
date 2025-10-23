@@ -44,6 +44,7 @@ namespace ProductService.Presentation.Features.Products.UpdateProduct
                     return Results.Json(new ApiResponse<ProductsResponse>(500, $"Server error: {ex.Message}"));
                 }
             })
+            .RequireAuthorization("RequireAdminRole", "RequireSellerRole") // cần đăng nhập và có permission thì mới dùng api này đc
             .WithTags("Products")
             .WithName("UpdateProduct")
             .Accepts<UpdateProductRequest>("multipart/form-data")

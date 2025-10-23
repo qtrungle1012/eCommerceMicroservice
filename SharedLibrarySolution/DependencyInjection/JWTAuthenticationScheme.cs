@@ -62,6 +62,8 @@ namespace SharedLibrarySolution.DependencyInjection
                     policy.RequireRole("SELLER"));
                 options.AddPolicy("RequireUserRole", policy =>
                     policy.RequireRole("USER"));
+                options.AddPolicy("RequireAdminOrSeller", policy =>
+                    policy.RequireRole("ADMIN","SELLER"));
             });
 
             return services;

@@ -12,7 +12,7 @@ namespace ProductService.Presentation.Features.Products.GetProducts
             {
                 var response = await handler.HandleAsync(query);
 
-                return Results.Ok(response);
+                return Results.Ok(new ApiResponse<PageResponse<ProductsResponse>>(StatusCodes.Status200OK, response));
             })
             .WithTags("Products")
 
