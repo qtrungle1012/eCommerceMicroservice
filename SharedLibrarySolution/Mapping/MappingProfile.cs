@@ -1,13 +1,18 @@
 ﻿using AutoMapper;
+using SharedLibrarySolution.Interfaces;
 using System.Reflection;
 
-namespace ProductService.Presentation.Common.Mapping
+namespace SharedLibrarySolution.Mapping
 {
     public class MappingProfile : Profile
     {
         public MappingProfile()
         {
-            ApplyMappingsFromAssembly(Assembly.GetExecutingAssembly());
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (var assembly in assemblies)
+            {
+                ApplyMappingsFromAssembly(assembly);
+            }
         }
         private void ApplyMappingsFromAssembly(Assembly assembly)
         {

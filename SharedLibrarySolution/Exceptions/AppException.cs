@@ -1,4 +1,4 @@
-﻿namespace IdentityService.Application.Common.Exceptions
+﻿namespace SharedLibrarySolution.Exceptions
 {
     public class AppException : Exception
     {

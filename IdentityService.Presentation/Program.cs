@@ -38,7 +38,8 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 var app = builder.Build(); // tạo app xong chạy qua các middleware
 
 // 🔹 Global Exception Middleware
-app.UseSharedPoliciesForBackendServices(); // vừa có GlobalException vừa có chặn các request với header k phải gateway
+//app.UseSharedPoliciesForBackendServices(); // vừa có GlobalException vừa có chặn các request với header k phải gateway
+app.UseSharedPolicies(); // test khi chưa bật gateway
 
 // 🔹 Swagger
 app.UseSwaggerDocumentation();

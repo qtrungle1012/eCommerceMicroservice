@@ -1,10 +1,4 @@
-﻿using IdentityService.Application.Common.Mappings;
-using IdentityService.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SharedLibrarySolution.Interfaces;
 
 namespace IdentityService.Application.DTOs
 {

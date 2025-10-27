@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 
-namespace IdentityService.Application.Common.Mappings
+namespace SharedLibrarySolution.Interfaces
 {
     public interface IMapFrom<T>
     {

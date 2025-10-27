@@ -1,5 +1,5 @@
-﻿using IdentityService.Application.Common.Mappings;
-using IdentityService.Domain.Entities;
+﻿using IdentityService.Domain.Entities;
+using SharedLibrarySolution.Interfaces;
 
 namespace IdentityService.Application.DTOs
 {

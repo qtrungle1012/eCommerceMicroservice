@@ -8,8 +8,11 @@
 
   <ItemGroup>
     <Compile Remove="Common\Behaviours\**" />
+    <Compile Remove="Features\Permission\**" />
     <EmbeddedResource Remove="Common\Behaviours\**" />
+    <EmbeddedResource Remove="Features\Permission\**" />
     <None Remove="Common\Behaviours\**" />
+    <None Remove="Features\Permission\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,12 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Permission\" />
     <Folder Include="Features\Role\Commands\" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
     <PackageReference Include="FluentValidation" Version="12.0.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
   </ItemGroup>

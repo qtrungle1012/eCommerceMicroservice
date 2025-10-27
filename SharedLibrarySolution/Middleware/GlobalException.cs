@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
+using SharedLibrarySolution.Exceptions;
 using SharedLibrarySolution.Logs;
+using SharedLibrarySolution.Responses;
+using System.Net;
 using System.Text.Json;
 
 namespace SharedLibrarySolution.Middleware
@@ -19,64 +22,72 @@ namespace SharedLibrarySolution.Middleware
             {
                 await _next(context);
 
-                // ✅ Chỉ ghi response nếu chưa started
+                //Nếu response chưa bắt đầu và là các lỗi thông dụng
                 if (!context.Response.HasStarted)
                 {
                     switch (context.Response.StatusCode)
                     {
                         case StatusCodes.Status401Unauthorized:
-                            await WriteResponse(context, 401, "Unauthorized",
-                                "Authentication required or invalid token.");
+                            await WriteResponse(context, 401, "Unauthorized - Authentication required or invalid token.");
                             break;
 
                         case StatusCodes.Status403Forbidden:
-                            await WriteResponse(context, 403, "Forbidden",
-                                "You do not have permission to access this resource.");
+                            await WriteResponse(context, 403, "Forbidden - You do not have permission to access this resource.");
                             break;
 
                         case StatusCodes.Status404NotFound:
-                            await WriteResponse(context, 404, "Not Found",
-                                "The requested resource could not be found.");
+                            await WriteResponse(context, 404, "The requested resource could not be found.");
                             break;
 
                         case StatusCodes.Status429TooManyRequests:
-                            await WriteResponse(context, 429, "Warning",
-                                "Too many requests!");
+                            await WriteResponse(context, 429, "Too many requests!");
                             break;
                     }
                 }
             }
+            catch (AppException appEx)
+            {
+                // ⚠️ Xử lý riêng AppException
+                LogException.LogError(appEx);
+                await HandleAppExceptionAsync(context, appEx);
+            }
             catch (Exception ex)
             {
+                // ❌ Xử lý các lỗi không xác định
                 LogException.LogError(ex);
-                await HandleExceptionAsync(context, ex);
+                await HandleUnknownExceptionAsync(context, ex);
             }
         }
 
-        private async Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private static async Task HandleAppExceptionAsync(HttpContext context, AppException exception)
         {
-            var cid = context.Items["X-Correlation-ID"]?.ToString();
-            if (!context.Response.HasStarted)
-            {
-                context.Response.StatusCode = 500;
-                context.Response.ContentType = "application/json";
+            context.Response.StatusCode = exception.StatusCode;
+            context.Response.ContentType = "application/json";
 
-                var response = new
-                {
-                    statusCode = 500,
-                    title = "Internal Server Error",
-                    correlationId = cid,
-                    traceId = context.TraceIdentifier,
-                    detail = exception.Message
-                };
+            var response = new ApiResponse<object>(
+                code: exception.StatusCode,
+                message: exception.Message
+            );
 
-                await context.Response.WriteAsync(JsonSerializer.Serialize(response,
-                    new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
-            }
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
         }
 
+        private static async Task HandleUnknownExceptionAsync(HttpContext context, Exception exception)
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.ContentType = "application/json";
 
-        private static async Task WriteResponse(HttpContext context, int statusCode, string title, string message)
+            var response = new ApiResponse<object>(
+                code: 500,
+                message: "Internal Server Error"
+            );
+
+            await context.Response.WriteAsync(JsonSerializer.Serialize(response,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }));
+        }
+
+        private static async Task WriteResponse(HttpContext context, int statusCode, string message)
         {
             if (context.Response.HasStarted)
                 return;
@@ -84,14 +95,14 @@ namespace SharedLibrarySolution.Middleware
             context.Response.StatusCode = statusCode;
             context.Response.ContentType = "application/json";
 
-            var response = new
-            {
-                statusCode,
-                title,
-                message
-            };
+            var response = new ApiResponse<object>(
+                code: statusCode,
+                message: message
+            );
 
-            var json = JsonSerializer.Serialize(response);
+            var json = JsonSerializer.Serialize(response,
+                new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
             await context.Response.WriteAsync(json);
         }
     }

@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using FluentValidation;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using SharedLibrarySolution.Exceptions;
 using SharedLibrarySolution.Responses;
 using System.Text.Json;
 
@@ -31,9 +32,7 @@ namespace ProductService.Presentation.Features.Products.CreateProduct
                     var result = await handler.HandleAsync(request);
                     if (result == null)
                     {
-                        return Results.BadRequest(
-                            new ApiResponse<ProductsResponse>(400, "Failed to create product")
-                        );
+                        throw new AppException("Failed to create product");
                     }
 
                     // 201 CREATED
@@ -44,21 +43,15 @@ namespace ProductService.Presentation.Features.Products.CreateProduct
                 }
                 catch (JsonException ex)
                 {
-                    return Results.BadRequest(
-                        new ApiResponse<ProductsResponse>(400, $"Invalid JSON data: {ex.Message}")
-                    );
+                    throw new AppException(ex.Message);
                 }
                 catch (ArgumentException ex)
                 {
-                    return Results.BadRequest(
-                        new ApiResponse<ProductsResponse>(400, ex.Message)
-                    );
+                    throw new AppException(ex.Message);
                 }
                 catch (Exception ex)
                 {
-                    return Results.Json(
-                        new ApiResponse<ProductsResponse>(500, $"Internal server error: {ex.Message}")
-                    );
+                    throw new AppException(ex.Message);
                 }
             })
             .RequireAuthorization("RequireAdminRole", "RequireSellerRole")

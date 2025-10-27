@@ -4,6 +4,7 @@ using ProductService.Presentation.Data;
 using ProductService.Presentation.Entities;
 using ProductService.Presentation.Services;
 using Newtonsoft.Json;
+using SharedLibrarySolution.Exceptions;
 
 
 namespace ProductService.Presentation.Features.Products.CreateProduct
@@ -26,7 +27,7 @@ namespace ProductService.Presentation.Features.Products.CreateProduct
             // VALIDATE VariantsJson -> chuyển chuỗi text lúc gửi dạng frmdata về json để lưu list object
             var variantDtos = JsonConvert.DeserializeObject<List<ProductVariantRequestDto>>(request.VariantsJson);
             if (variantDtos == null)
-                throw new ArgumentException("Invalid Variants JSON");
+                throw new AppException("Invalid Variants JSON");
 
             //upload anh sp
             var imageUrls = new List<string>();

@@ -1,9 +1,9 @@
-﻿using IdentityService.Application.Common.Exceptions;
-using IdentityService.Application.Common.Mappings;
+﻿using IdentityService.Application.Common.Mappings;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces.IRepositories;
 using IdentityService.Application.Interfaces.Security;
 using MediatR;
+using SharedLibrarySolution.Exceptions;
 
 namespace IdentityService.Application.Features.Auth.Command.Login
 {

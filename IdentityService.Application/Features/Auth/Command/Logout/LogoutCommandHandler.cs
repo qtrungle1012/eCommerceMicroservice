@@ -1,6 +1,6 @@
-﻿using IdentityService.Application.Common.Exceptions;
-using IdentityService.Application.Interfaces.IRepositories;
+﻿using IdentityService.Application.Interfaces.IRepositories;
 using MediatR;
+using SharedLibrarySolution.Exceptions;
 
 namespace IdentityService.Application.Features.Auth.Command.Logout
 {

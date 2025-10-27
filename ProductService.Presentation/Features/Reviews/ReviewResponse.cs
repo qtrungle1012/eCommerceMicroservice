@@ -1,5 +1,5 @@
-﻿using ProductService.Presentation.Common.Mapping;
-using ProductService.Presentation.Entities;
+﻿using ProductService.Presentation.Entities;
+using SharedLibrarySolution.Interfaces;
 
 namespace ProductService.Presentation.Features.Reviews
 {

@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
+using MassTransit;
 using ProductService.Presentation.Configurations;
 using ProductService.Presentation.Data;
+using ProductService.Presentation.Entities.Events;
 using ProductService.Presentation.Features.Categories.GetCategories;
 using ProductService.Presentation.Features.Products.CreateProduct;
 using ProductService.Presentation.Features.Products.DeleteProduct;
@@ -12,12 +14,43 @@ using ProductService.Presentation.Features.Reviews.GetReviews;
 using ProductService.Presentation.Features.Test;
 using ProductService.Presentation.Services;
 using SharedLibrarySolution.DependencyInjection;
+using SharedLibrarySolution.Mapping;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddJWTAuthenticationScheme(builder.Configuration); // lấy secrect key để decode
-builder.Services.AddHttpContextAccessor(); // ✅ THÊM DÒNG NÀY
+builder.Services.AddHttpContextAccessor();
+
+// MassTransit dùng cho rabits mq
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(builder.Configuration["RabbitMQ:Host"] ?? "localhost", h =>
+        {
+            h.Username(builder.Configuration["RabbitMQ:Username"] ?? "guest");
+            h.Password(builder.Configuration["RabbitMQ:Password"] ?? "guest");
+        });
+
+        // ✅ SỬA LẠI - Cấu hình đúng
+        cfg.Message<ProductUpdatedEvent>(x =>
+        {
+            x.SetEntityName("product_exchange"); // Exchange name
+        });
+
+        cfg.Publish<ProductUpdatedEvent>(x =>
+        {
+            x.ExchangeType = "direct"; // Direct exchange
+        });
+
+        // ✅ THÊM: Set default routing key khi publish
+        cfg.Send<ProductUpdatedEvent>(x =>
+        {
+            x.UseRoutingKeyFormatter(context => "product.updated");
+        });
+    });
+});
 
 // Đăng ký MongoDB Context
 builder.Services.AddSingleton<MongoDbContext>();
@@ -34,7 +67,10 @@ builder.Services.AddScoped<GetProductByIdHandler>();
 
 
 //Khai báo AutoMapper, tìm MappingProfile trong Assembly(dự án này)
-builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+//builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+
 // Đăng ký tất cả validator
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
@@ -59,7 +95,7 @@ using (var scope = app.Services.CreateScope())
 
 
 // 🔹 Global Exception Middleware
-app.UseSharedPoliciesForBackendServices(); // vừa có GlobalException vừa có chặn các request với header k phải gateway
+//app.UseSharedPoliciesForBackendServices(); // vừa có GlobalException vừa có chặn các request với header k phải gateway
 
 
 // 🔹 Swagger
@@ -68,8 +104,9 @@ app.UseSwaggerDocumentation();
 // Chứng thực và phân quyền
 app.UseAuthentication();
 app.UseAuthorization();
-// Map Endpoints
 
+
+// Map Endpoints
 app.MapGetProductsEndpoint();
 app.MapGetCategoriesEndpoint();
 app.MapGetPromotionsEndpoint();

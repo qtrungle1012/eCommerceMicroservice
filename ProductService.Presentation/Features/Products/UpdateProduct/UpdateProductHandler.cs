@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using MassTransit;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using ProductService.Presentation.Data;
 using ProductService.Presentation.Entities;
+using ProductService.Presentation.Entities.Events;
 using ProductService.Presentation.Features.Products.CreateProduct;
 using ProductService.Presentation.Services;
+using SharedLibrarySolution.Exceptions;
 
 namespace ProductService.Presentation.Features.Products.UpdateProduct
 {
@@ -13,21 +16,31 @@ namespace ProductService.Presentation.Features.Products.UpdateProduct
         private readonly MongoDbContext _context;
         private readonly CloudinaryService _cloudinaryService;
         private readonly IMapper _mapper;
+        private readonly IPublishEndpoint _publishEndpoint;
 
-        public UpdateProductHandler(MongoDbContext context, CloudinaryService cloudinaryService, IMapper mapper)
+        public UpdateProductHandler(MongoDbContext context,
+                                    CloudinaryService cloudinaryService,
+                                    IMapper mapper,
+                                    IPublishEndpoint publishEndpoint)
         {
             _context = context;
             _cloudinaryService = cloudinaryService;
             _mapper = mapper;
+            _publishEndpoint = publishEndpoint;
         }
 
         public async Task<ProductsResponse?> HandleAsync(string id, UpdateProductRequest request)
         {
             var product = await _context.Products.Find(p => p.Id == id).FirstOrDefaultAsync();
             if (product == null)
-                throw new ArgumentException("Product not found");
+                throw new AppException("Product not found");
 
-            // Parse variants nếu có gửi
+            // ✅ Lưu giá trị cũ để so sánh
+            var oldPrice = product.Price;
+            var oldName = product.Name;
+            var oldImageUrl = product.ImageUrls?.FirstOrDefault() ?? "";
+
+            // ✅ Parse variants nếu có gửi (THÊM LẠI PHẦN NÀY)
             List<ProductVariantRequestDto>? variantDtos = null;
             if (!string.IsNullOrEmpty(request.VariantsJson))
             {
@@ -37,7 +50,7 @@ namespace ProductService.Presentation.Features.Products.UpdateProduct
             // Xử lý ảnh
             List<string> imageUrls = product.ImageUrls?.ToList() ?? new List<string>();
 
-            // parse chuỗi danh sách ảnh cũ về dạng json
+            // Parse chuỗi danh sách ảnh cũ về dạng json
             if (!string.IsNullOrEmpty(request.OldImageUrls))
             {
                 try
@@ -45,13 +58,12 @@ namespace ProductService.Presentation.Features.Products.UpdateProduct
                     var oldUrls = JsonConvert.DeserializeObject<List<string>>(request.OldImageUrls)
                         ?.Where(url => !string.IsNullOrWhiteSpace(url))
                         .ToList();
-
                     if (oldUrls != null)
                         imageUrls = oldUrls;
                 }
                 catch
                 {
-                    throw new ArgumentException("Invalid OldImageUrls JSON format");
+                    throw new AppException("Invalid OldImageUrls JSON format");
                 }
             }
 
@@ -78,6 +90,7 @@ namespace ProductService.Presentation.Features.Products.UpdateProduct
             if (!string.IsNullOrWhiteSpace(request.CategoryId))
                 product.CategoryId = request.CategoryId;
 
+            // ✅ Cập nhật variants nếu có
             if (variantDtos != null)
             {
                 product.Variants = variantDtos.Select(v => new ProductVariant
@@ -92,7 +105,29 @@ namespace ProductService.Presentation.Features.Products.UpdateProduct
             product.ImageUrls = imageUrls;
             product.UpdatedAt = DateTime.UtcNow;
 
+            // Lưu vào MongoDB
             await _context.Products.ReplaceOneAsync(p => p.Id == id, product);
+
+            // ✅ Kiểm tra thay đổi quan trọng
+            var newImageUrl = imageUrls.FirstOrDefault() ?? "";
+            var hasImportantChanges =
+                oldPrice != product.Price ||
+                oldName != product.Name ||
+                oldImageUrl != newImageUrl;
+
+            if (hasImportantChanges)
+            {
+                // ✅ Publish event để BasketService cập nhật
+                await _publishEndpoint.Publish(new ProductUpdatedEvent
+                {
+                    ProductId = product.Id!,
+                    ProductName = product.Name,
+                    ImageUrl = newImageUrl, // CHỈ GỬI 1 ẢNH ĐẦU TIÊN
+                    Price = product.Price,
+                    UpdatedAt = DateTime.UtcNow
+                });
+            }
+
             return _mapper.Map<ProductsResponse>(product);
         }
     }

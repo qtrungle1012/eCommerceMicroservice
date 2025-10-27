@@ -1,8 +1,8 @@
-﻿using IdentityService.Application.Common.Exceptions;
-using IdentityService.Application.Interfaces.IRepositories;
+﻿using IdentityService.Application.Interfaces.IRepositories;
 using IdentityService.Domain.Entities;
 using IdentityService.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using SharedLibrarySolution.Exceptions;
 using SharedLibrarySolution.Logs;
 using System.Linq.Expressions;
 

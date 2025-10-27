@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using IdentityService.Application.Common.Exceptions;
 using IdentityService.Application.Common.Mappings;
 using IdentityService.Application.DTOs;
 using IdentityService.Application.Interfaces.IRepositories;
 using IdentityService.Application.Interfaces.Security;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using SharedLibrarySolution.Exceptions;
 
 namespace IdentityService.Application.Features.User.Commands.CreateUser
 {

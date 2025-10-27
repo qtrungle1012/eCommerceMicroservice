@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MongoDB.Driver;
 using ProductService.Presentation.Data;
+using SharedLibrarySolution.Exceptions;
 
 namespace ProductService.Presentation.Features.Products.GetProductById
 {
@@ -19,7 +20,7 @@ namespace ProductService.Presentation.Features.Products.GetProductById
         {
             var productDetail = await _context.Products.Find(p => p.Id == id).FirstOrDefaultAsync();
             if (productDetail == null)
-                throw new ArgumentException("Product not found");
+                throw new AppException("Product not found");
 
             var response  = _mapper.Map<ProductsResponse>(productDetail);
             return response;

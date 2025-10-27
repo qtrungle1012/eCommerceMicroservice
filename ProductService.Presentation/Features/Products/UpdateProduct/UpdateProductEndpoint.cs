@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using SharedLibrarySolution.Exceptions;
 using SharedLibrarySolution.Responses;
 
 namespace ProductService.Presentation.Features.Products.UpdateProduct
@@ -33,18 +34,18 @@ namespace ProductService.Presentation.Features.Products.UpdateProduct
                 }
                 catch (JsonException ex)
                 {
-                    return Results.BadRequest(new ApiResponse<ProductsResponse>(400, $"Invalid JSON: {ex.Message}"));
+                    throw new AppException(ex.Message);
                 }
                 catch (ArgumentException ex)
                 {
-                    return Results.BadRequest(new ApiResponse<ProductsResponse>(400, ex.Message));
+                    throw new AppException(ex.Message);
                 }
                 catch (Exception ex)
                 {
-                    return Results.Json(new ApiResponse<ProductsResponse>(500, $"Server error: {ex.Message}"));
+                    throw new AppException(ex.Message);
                 }
             })
-            .RequireAuthorization("RequireAdminRole", "RequireSellerRole") // cần đăng nhập và có permission thì mới dùng api này đc
+            .RequireAuthorization("RequireAdminOrSeller") // cần đăng nhập và có permission thì mới dùng api này đc
             .WithTags("Products")
             .WithName("UpdateProduct")
             .Accepts<UpdateProductRequest>("multipart/form-data")
