@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ProductService.Presentation\ProductService.Presentation.csproj" />
     <ProjectReference Include="..\SharedLibrarySolution\SharedLibrarySolution.csproj" />
   </ItemGroup>
 

@@ -12,35 +12,36 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddJWTAuthenticationScheme(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 
-
-// consummer nhận even tu producer
+// ✅ CONSUMER - Cấu hình MassTransit
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<ProductUpdatedConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host(builder.Configuration["RabbitMQ:Host"] ?? "localhost", h =>
+        cfg.Host("localhost", h =>
         {
-            h.Username(builder.Configuration["RabbitMQ:Username"] ?? "guest");
-            h.Password(builder.Configuration["RabbitMQ:Password"] ?? "guest");
+            h.Username("guest");
+            h.Password("guest");
         });
 
-        // ✅ SỬA LẠI - Thêm RoutingKey
         cfg.ReceiveEndpoint("basket_product_update_queue", e =>
         {
             e.ConfigureConsumeTopology = false;
 
-            e.Bind("product_exchange", x => // exchange name
+            // Bind tới exchange product_exchange, nhận tất cả routing key
+            e.Bind("product_exchange", s =>
             {
-                x.ExchangeType = "direct";
-                x.RoutingKey = "product.updated"; // ✅ THÊM ROUTING KEY
+                s.ExchangeType = "direct";
+                s.RoutingKey = "product.updated";
             });
 
             e.ConfigureConsumer<ProductUpdatedConsumer>(context);
         });
     });
 });
+
+
 
 
 // Add services to the container.
@@ -61,6 +62,10 @@ builder.Services.AddRedisConfiguration(builder.Configuration);
 var app = builder.Build();
 
 app.UseHttpsRedirection();
+
+//middle ware
+app.UseSharedPolicies();
+
 
 // 🔹 Swagger
 app.UseSwaggerDocumentation();

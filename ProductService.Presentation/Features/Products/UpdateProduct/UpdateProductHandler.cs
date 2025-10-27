@@ -35,12 +35,12 @@ namespace ProductService.Presentation.Features.Products.UpdateProduct
             if (product == null)
                 throw new AppException("Product not found");
 
-            // ✅ Lưu giá trị cũ để so sánh
+            // Lưu giá trị cũ
             var oldPrice = product.Price;
             var oldName = product.Name;
             var oldImageUrl = product.ImageUrls?.FirstOrDefault() ?? "";
 
-            // ✅ Parse variants nếu có gửi (THÊM LẠI PHẦN NÀY)
+            // Parse variants
             List<ProductVariantRequestDto>? variantDtos = null;
             if (!string.IsNullOrEmpty(request.VariantsJson))
             {
@@ -50,7 +50,6 @@ namespace ProductService.Presentation.Features.Products.UpdateProduct
             // Xử lý ảnh
             List<string> imageUrls = product.ImageUrls?.ToList() ?? new List<string>();
 
-            // Parse chuỗi danh sách ảnh cũ về dạng json
             if (!string.IsNullOrEmpty(request.OldImageUrls))
             {
                 try
@@ -67,7 +66,7 @@ namespace ProductService.Presentation.Features.Products.UpdateProduct
                 }
             }
 
-            // Upload ảnh mới (nếu có)
+            // Upload ảnh mới
             if (request.Images != null && request.Images.Any())
             {
                 foreach (var img in request.Images)
@@ -77,7 +76,7 @@ namespace ProductService.Presentation.Features.Products.UpdateProduct
                 }
             }
 
-            // Cập nhật dữ liệu (chỉ cập nhật nếu có gửi)
+            // Cập nhật dữ liệu
             if (!string.IsNullOrWhiteSpace(request.Name))
                 product.Name = request.Name;
 
@@ -90,7 +89,6 @@ namespace ProductService.Presentation.Features.Products.UpdateProduct
             if (!string.IsNullOrWhiteSpace(request.CategoryId))
                 product.CategoryId = request.CategoryId;
 
-            // ✅ Cập nhật variants nếu có
             if (variantDtos != null)
             {
                 product.Variants = variantDtos.Select(v => new ProductVariant
@@ -101,31 +99,37 @@ namespace ProductService.Presentation.Features.Products.UpdateProduct
                 }).ToList();
             }
 
-            // Cập nhật ảnh cuối cùng
             product.ImageUrls = imageUrls;
             product.UpdatedAt = DateTime.UtcNow;
 
             // Lưu vào MongoDB
             await _context.Products.ReplaceOneAsync(p => p.Id == id, product);
 
-            // ✅ Kiểm tra thay đổi quan trọng
-            var newImageUrl = imageUrls.FirstOrDefault() ?? "";
+            // Kiểm tra thay đổi
+
             var hasImportantChanges =
                 oldPrice != product.Price ||
-                oldName != product.Name ||
-                oldImageUrl != newImageUrl;
+                oldName != product.Name;
+               
 
             if (hasImportantChanges)
             {
-                // ✅ Publish event để BasketService cập nhật
-                await _publishEndpoint.Publish(new ProductUpdatedEvent
+                var @event = new ProductUpdatedEvent
                 {
                     ProductId = product.Id!,
                     ProductName = product.Name,
-                    ImageUrl = newImageUrl, // CHỈ GỬI 1 ẢNH ĐẦU TIÊN
                     Price = product.Price,
                     UpdatedAt = DateTime.UtcNow
+                };
+
+                // PUBLISH với ROUTING KEY
+                Console.WriteLine("📢 Publishing to product_exchange with routing key: product.updated");
+                await _publishEndpoint.Publish(@event, ctx =>
+                {
+                    ctx.SetRoutingKey("product.updated");
                 });
+
+                Console.WriteLine($"==>Published: ProductId={@event.ProductId}, Name={@event.ProductName}, Price=${@event.Price}");
             }
 
             return _mapper.Map<ProductsResponse>(product);

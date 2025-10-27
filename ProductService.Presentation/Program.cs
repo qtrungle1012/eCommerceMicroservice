@@ -22,33 +22,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddJWTAuthenticationScheme(builder.Configuration); // lấy secrect key để decode
 builder.Services.AddHttpContextAccessor();
 
-// MassTransit dùng cho rabits mq
+// ✅ PRODUCER - Cấu hình MassTransit
 builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host(builder.Configuration["RabbitMQ:Host"] ?? "localhost", h =>
+        cfg.Host("localhost", h =>
         {
-            h.Username(builder.Configuration["RabbitMQ:Username"] ?? "guest");
-            h.Password(builder.Configuration["RabbitMQ:Password"] ?? "guest");
+            h.Username("guest");
+            h.Password("guest");
         });
 
-        // ✅ SỬA LẠI - Cấu hình đúng
-        cfg.Message<ProductUpdatedEvent>(x =>
-        {
-            x.SetEntityName("product_exchange"); // Exchange name
-        });
-
-        cfg.Publish<ProductUpdatedEvent>(x =>
-        {
-            x.ExchangeType = "direct"; // Direct exchange
-        });
-
-        // ✅ THÊM: Set default routing key khi publish
-        cfg.Send<ProductUpdatedEvent>(x =>
-        {
-            x.UseRoutingKeyFormatter(context => "product.updated");
-        });
+        // ✅ Cấu hình Publish cho ProductUpdatedEvent
+        cfg.Message<ProductUpdatedEvent>(m => m.SetEntityName("product_exchange"));
+        cfg.Publish<ProductUpdatedEvent>(p => p.ExchangeType = "direct");
     });
 });
 
@@ -96,6 +83,7 @@ using (var scope = app.Services.CreateScope())
 
 // 🔹 Global Exception Middleware
 //app.UseSharedPoliciesForBackendServices(); // vừa có GlobalException vừa có chặn các request với header k phải gateway
+app.UseSharedPolicies();
 
 
 // 🔹 Swagger

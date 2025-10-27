@@ -35,7 +35,7 @@ namespace BasketService.Presentation.Features.Baskets.AddItemToBasket
                 ? new BasketService.Presentation.Entities.Basket { UserId = Guid.Parse(userId) }
                 : JsonSerializer.Deserialize<BasketService.Presentation.Entities.Basket>(basketJson!);
 
-            // ✅ Tìm item theo UniqueKey
+            // Tìm item theo UniqueKey
             var uniqueKey = string.IsNullOrEmpty(request.Sku)
                 ? request.ProductId
                 : $"{request.ProductId}_{request.Sku}";
@@ -44,14 +44,14 @@ namespace BasketService.Presentation.Features.Baskets.AddItemToBasket
 
             if (existingItem != null)
             {
-                // ✅ Đã có → Tăng số lượng
+                // Đã có → Tăng số lượng
                 existingItem.Quantity += request.Quantity;
                 existingItem.Price = request.Price;
                 existingItem.DiscountPrice = request.DiscountPrice;
             }
             else
             {
-                // ✅ Chưa có → Thêm mới
+                // Chưa có → Thêm mới
                 basket.Items.Add(new BasketItem
                 {
                     ProductId = request.ProductId,
@@ -69,7 +69,7 @@ namespace BasketService.Presentation.Features.Baskets.AddItemToBasket
             var updatedJson = JsonSerializer.Serialize(basket);
             await _redis.StringSetAsync(basketKey, updatedJson, basket.TTL);
 
-            // ✅ Reverse index
+            // Reverse index
             var productUsersKey = $"product:{request.ProductId}:users";
             await _redis.SetAddAsync(productUsersKey, userId);
 

@@ -30,7 +30,7 @@ namespace BasketService.Presentation.Features.Baskets.GetBasket
 
                 var key = $"basket:{userId}";
 
-                // ✅ Đọc dạng string (vì AddItemHandler lưu bằng StringSetAsync)
+                // Đọc dạng string (vì AddItemHandler lưu bằng StringSetAsync)
                 var basketJson = await _redis.StringGetAsync(key);
 
                 if (string.IsNullOrEmpty(basketJson))
@@ -42,7 +42,7 @@ namespace BasketService.Presentation.Features.Baskets.GetBasket
                     };
                 }
 
-                // ✅ Giải mã JSON thành entity
+                // Giải mã JSON thành entity
                 var basket = JsonConvert.DeserializeObject<BasketService.Presentation.Entities.Basket>(basketJson!);
 
                 if (basket == null)
@@ -54,7 +54,7 @@ namespace BasketService.Presentation.Features.Baskets.GetBasket
                     };
                 }
 
-                // ✅ Map sang DTO
+                // Map sang DTO
                 var basketResponse = _mapper.Map<BasketResponse>(basket);
                 basketResponse.TotalPrice = basket.TotalPrice;
                 return basketResponse;

@@ -1,5 +1,6 @@
-﻿using BasketService.Presentation.Entities.Events;
-using MassTransit;
+﻿using MassTransit;
+using ProductService.Presentation.Entities.Events;
+using SharedLibrarySolution.Exceptions;
 using StackExchange.Redis;
 using System.Text.Json;
 
@@ -20,8 +21,8 @@ namespace BasketService.Presentation.Features.Baskets.Consumers
         {
             var @event = context.Message;
 
-            _logger.LogInformation("📦 Received ProductUpdatedEvent: ProductId={ProductId}, Price={Price}",
-                @event.ProductId, @event.Price);
+            Console.WriteLine($"Received ProductUpdatedEvent => ProductId={@event.ProductId}, Name=\"{@event.ProductName}\", Price={@event.Price}");
+
 
             try
             {
@@ -30,7 +31,7 @@ namespace BasketService.Presentation.Features.Baskets.Consumers
 
                 if (userIds.Length == 0)
                 {
-                    _logger.LogInformation("No baskets contain ProductId={ProductId}", @event.ProductId);
+                    Console.WriteLine("No baskets contain ProductId={ProductId}", @event.ProductId);
                     return;
                 }
 
@@ -50,17 +51,17 @@ namespace BasketService.Presentation.Features.Baskets.Consumers
                     var basket = JsonSerializer.Deserialize<BasketService.Presentation.Entities.Basket>(basketJson!);
                     if (basket == null) continue;
 
-                    // ✅ CHỈ update items KHÔNG có SKU (sản phẩm đơn giản)
+                    // ✅ Update mọi item có ProductId trùng
                     var itemsToUpdate = basket.Items
-                        .Where(i => i.ProductId == @event.ProductId && string.IsNullOrEmpty(i.Sku))
+                        .Where(i => i.ProductId == @event.ProductId)
                         .ToList();
 
                     if (itemsToUpdate.Any())
                     {
                         foreach (var item in itemsToUpdate)
                         {
+                            item.ProductName = @event.ProductName;
                             item.Price = @event.Price;
-                            // DiscountPrice giữ nguyên
                         }
 
                         basket.UpdatedAt = DateTime.UtcNow;
@@ -72,13 +73,13 @@ namespace BasketService.Presentation.Features.Baskets.Consumers
                     }
                 }
 
-                _logger.LogInformation("✅ Updated {Count} baskets for ProductId={ProductId}",
-                    updatedCount, @event.ProductId);
+                //Console.WriteLine("Updated {Count} baskets for ProductId={ProductId}",
+                //    updatedCount, @event.ProductId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Error processing ProductUpdatedEvent");
-                throw;
+                Console.WriteLine(" Error processing ProductUpdatedEvent:" +ex);
+                throw new AppException(" Error processing ProductUpdatedEvent:" + ex);
             }
         }
     }
