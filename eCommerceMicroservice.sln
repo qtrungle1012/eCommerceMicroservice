@@ -29,6 +29,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BasketService", "BasketServ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasketService.Presentation", "BasketService.Presentation\BasketService.Presentation.csproj", "{AFE3DE1D-CA39-46A6-8A4C-347A17760093}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "InventoryService", "InventoryService", "{2141B111-CCF0-4989-B573-F878E96462E4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryService.Presentation", "InventoryService.Presentation\InventoryService.Presentation.csproj", "{5EA358B7-EA8E-4B44-AD7E-E48108E96FF6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryService.Application", "InventoryService.Application\InventoryService.Application.csproj", "{5F8B3D78-1903-42A0-8439-7104721A68E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryService.Domain", "InventoryService.Domain\InventoryService.Domain.csproj", "{96B8B11E-9548-47E5-BAFF-385AB7E23313}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryService.Infrastructure", "InventoryService.Infrastructure\InventoryService.Infrastructure.csproj", "{D65EFE25-C6C8-4B57-B0D9-2EBB8E70F48C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +77,22 @@ Global
 		{AFE3DE1D-CA39-46A6-8A4C-347A17760093}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AFE3DE1D-CA39-46A6-8A4C-347A17760093}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AFE3DE1D-CA39-46A6-8A4C-347A17760093}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5EA358B7-EA8E-4B44-AD7E-E48108E96FF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EA358B7-EA8E-4B44-AD7E-E48108E96FF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EA358B7-EA8E-4B44-AD7E-E48108E96FF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EA358B7-EA8E-4B44-AD7E-E48108E96FF6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F8B3D78-1903-42A0-8439-7104721A68E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F8B3D78-1903-42A0-8439-7104721A68E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F8B3D78-1903-42A0-8439-7104721A68E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F8B3D78-1903-42A0-8439-7104721A68E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96B8B11E-9548-47E5-BAFF-385AB7E23313}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96B8B11E-9548-47E5-BAFF-385AB7E23313}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96B8B11E-9548-47E5-BAFF-385AB7E23313}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96B8B11E-9548-47E5-BAFF-385AB7E23313}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D65EFE25-C6C8-4B57-B0D9-2EBB8E70F48C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D65EFE25-C6C8-4B57-B0D9-2EBB8E70F48C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D65EFE25-C6C8-4B57-B0D9-2EBB8E70F48C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D65EFE25-C6C8-4B57-B0D9-2EBB8E70F48C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,6 +106,10 @@ Global
 		{647A9B17-4255-49A6-84C3-A21930126F5F} = {C5F5EF2E-DAD6-49C7-B08C-1B942752CE4C}
 		{875A7E1E-E96F-4B1E-93BB-E90A8DC38B17} = {F7C0AD9F-01DE-4B94-A073-381DF3BB3C52}
 		{AFE3DE1D-CA39-46A6-8A4C-347A17760093} = {59F11ED8-5437-4D27-B7B7-BE6BD57BA243}
+		{5EA358B7-EA8E-4B44-AD7E-E48108E96FF6} = {2141B111-CCF0-4989-B573-F878E96462E4}
+		{5F8B3D78-1903-42A0-8439-7104721A68E3} = {2141B111-CCF0-4989-B573-F878E96462E4}
+		{96B8B11E-9548-47E5-BAFF-385AB7E23313} = {2141B111-CCF0-4989-B573-F878E96462E4}
+		{D65EFE25-C6C8-4B57-B0D9-2EBB8E70F48C} = {2141B111-CCF0-4989-B573-F878E96462E4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DB619522-D28B-410E-B7D8-941F3050D8F7}

@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddJWTAuthenticationScheme(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 
-// ✅ CONSUMER - Cấu hình MassTransit
+// CONSUMER - Cấu hình MassTransit
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumer<ProductUpdatedConsumer>();
@@ -27,7 +27,7 @@ builder.Services.AddMassTransit(x =>
 
         cfg.ReceiveEndpoint("basket_product_update_queue", e =>
         {
-            e.ConfigureConsumeTopology = false;
+            e.ConfigureConsumeTopology = false; // tắc bidding mặc định
 
             // Bind tới exchange product_exchange, nhận tất cả routing key
             e.Bind("product_exchange", s =>
@@ -35,7 +35,6 @@ builder.Services.AddMassTransit(x =>
                 s.ExchangeType = "direct";
                 s.RoutingKey = "product.updated";
             });
-
             e.ConfigureConsumer<ProductUpdatedConsumer>(context);
         });
     });

@@ -95,7 +95,6 @@ namespace ProductService.Presentation.Features.Products.UpdateProduct
                 {
                     Sku = v.Sku,
                     Price = v.Price,
-                    StockQuantity = v.StockQuantity
                 }).ToList();
             }
 

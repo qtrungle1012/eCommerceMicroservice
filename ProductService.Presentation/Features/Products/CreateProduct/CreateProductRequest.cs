@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 //do có gửi ảnh sản phẩm nên cần gửi fromdata các trường dưới đây xử lý để hỗ trợ cho việc đó tiện hơn
 namespace ProductService.Presentation.Features.Products.CreateProduct
@@ -28,7 +26,5 @@ namespace ProductService.Presentation.Features.Products.CreateProduct
         [JsonPropertyName("price")]
         public decimal Price { get; set; }
 
-        [JsonPropertyName("stockQuantity")]
-        public int StockQuantity { get; set; }
     }
 }

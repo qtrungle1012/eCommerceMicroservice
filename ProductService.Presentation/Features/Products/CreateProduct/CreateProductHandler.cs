@@ -54,7 +54,6 @@ namespace ProductService.Presentation.Features.Products.CreateProduct
                 {
                     Sku = v.Sku,
                     Price = v.Price,
-                    StockQuantity = v.StockQuantity
                 }).ToList(),
                 ImageUrls = imageUrls
             };

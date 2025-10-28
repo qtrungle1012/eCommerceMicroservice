@@ -7,7 +7,6 @@ namespace ProductService.Presentation.Features.Products
     {
         public string Sku { get; set; } = string.Empty;
         public decimal Price { get; set; }
-        public int StockQuantity { get; set; }
     }
 
     public class ProductsResponse : IMapFrom<Product>

@@ -22,7 +22,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddJWTAuthenticationScheme(builder.Configuration); // lấy secrect key để decode
 builder.Services.AddHttpContextAccessor();
 
-// ✅ PRODUCER - Cấu hình MassTransit
+// PRODUCER - Cấu hình MassTransit
 builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>
@@ -33,7 +33,7 @@ builder.Services.AddMassTransit(x =>
             h.Password("guest");
         });
 
-        // ✅ Cấu hình Publish cho ProductUpdatedEvent
+        // Cấu hình Publish cho ProductUpdatedEvent
         cfg.Message<ProductUpdatedEvent>(m => m.SetEntityName("product_exchange"));
         cfg.Publish<ProductUpdatedEvent>(p => p.ExchangeType = "direct");
     });
