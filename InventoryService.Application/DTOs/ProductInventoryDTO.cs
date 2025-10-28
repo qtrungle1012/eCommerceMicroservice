@@ -1,13 +1,14 @@
-﻿namespace InventoryService.Domain.Entities
+﻿using InventoryService.Domain.Entities;
+using SharedLibrarySolution.Interfaces;
+
+namespace InventoryService.Application.DTOs
 {
-    public class ProductsInventory
+    public class ProductInventoryDTO : IMapFrom<ProductsInventory>
     {
         public Guid Id { get; set; }
         public string ProductId { get; set; } = string.Empty;
         public string Sku { get; set; } = string.Empty;
         public int StockQuantity { get; set; }
-        public int ReservedQuantity { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; }
     }
 }

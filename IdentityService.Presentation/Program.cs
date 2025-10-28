@@ -17,7 +17,7 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
 
-// 🔹 Đăng ký các tầng
+// Đăng ký các tầng
 builder.Services.AddInfrastructureServices(builder.Configuration); // kết nối database
 builder.Services.AddApplicationServices(); // cấu hình MediatR, AutoMapper hoặc Validator.
 builder.Services.AddJWTAuthenticationScheme(builder.Configuration); // cấu hình Cấu hình middleware xác thực.
@@ -26,7 +26,7 @@ builder.Services.AddJWTAuthenticationScheme(builder.Configuration); // cấu hì
 builder.Services.AddControllers();// cho phép định nghĩa các controller
 builder.Services.AddSwaggerDocumentation(); 
 
-// 🔹 Autofac Container
+// Autofac Container
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
     containerBuilder.RegisterAssemblyTypes(typeof(IdentityService.Infrastructure.ConfigureServices).Assembly)
@@ -37,18 +37,18 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 
 var app = builder.Build(); // tạo app xong chạy qua các middleware
 
-// 🔹 Global Exception Middleware
+// Global Exception Middleware
 //app.UseSharedPoliciesForBackendServices(); // vừa có GlobalException vừa có chặn các request với header k phải gateway
 app.UseSharedPolicies(); // test khi chưa bật gateway
 
-// 🔹 Swagger
+// Swagger
 app.UseSwaggerDocumentation();
 
-// 🔹 Auth
+// Auth
 app.UseAuthentication();
 app.UseAuthorization();
 
-// 🔹 Map Controllers
+// Map Controllers
 app.MapControllers();
 
 app.Run();
